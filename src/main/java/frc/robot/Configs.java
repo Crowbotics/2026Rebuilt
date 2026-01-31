@@ -57,4 +57,36 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+
+    public static final class CollectorConfigs {
+        public static final SparkMaxConfig armConfig = new SparkMaxConfig();
+
+        static {
+                armConfig
+                        .idleMode(IdleMode.kBrake)
+                        .closedLoop
+                                .pid(0, 0, 0)
+                                .outputRange(-1, 1)
+                                .positionWrappingEnabled(false);
+        }
+    }
+
+    public static final class LauncherConfigs {
+        public static final SparkMaxConfig flywheelConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig hoodConfig = new SparkMaxConfig();
+
+        static {
+                flywheelConfig
+                        .idleMode(IdleMode.kBrake)
+                        .closedLoop
+                                .pid(0, 0, 0)
+                                .outputRange(-1, 1);
+                
+                hoodConfig
+                        .idleMode(IdleMode.kBrake)
+                        .closedLoop
+                                .pid(0, 0, 0)
+                                .outputRange(-1, 1);
+        }
+    }
 }

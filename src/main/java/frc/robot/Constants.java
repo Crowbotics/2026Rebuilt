@@ -70,7 +70,7 @@ public final class Constants {
     public static final double kBackLeftChassisAngularOffset = 0;//Math.PI;
     public static final double kBackRightChassisAngularOffset = 0;//Math.PI / 2;
 
-    // SPARK MAX CAN IDs
+    // CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
     public static final int kRearLeftDrivingCanId = 4;
     public static final int kFrontRightDrivingCanId = 2;
@@ -82,6 +82,30 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 7;
 
     public static final boolean kGyroReversed = false;
+  }
+
+  public static final class CollectorConstants {
+    // CAN IDs
+    public static final int kArmCanId = 0;
+    public static final int kRollerCanId = 0;
+
+    public static final double kRollerSpeed = 0.5;
+
+    public static final double kArmUnextendedSetpoint = 0;
+    public static final double kArmExtendedSetpoint = 0;
+  }
+
+  public static final class SpindexerConstants {
+    public static final int kSpinnerCanId = 0;
+    public static final int kKickerCanId = 0;
+
+    public static final double kSpinnerSpeed = 0.5;
+    public static final double kKickerSpeed = 0.5;
+  }
+
+  public static final class LauncherConstants {
+    public static final int kFlywheelCanId = 0;
+    public static final int kHoodCanId = 0;
   }
 
   public static final class ModuleConstants {
