@@ -106,6 +106,9 @@ public final class Constants {
   public static final class LauncherConstants {
     public static final int kFlywheelCanId = 0;
     public static final int kHoodCanId = 0;
+    
+    public static final double kLauncherSpeed = 0.67;
+    public static final double kHoodspeed = 0.3;
   }
 
   public static final class ModuleConstants {
