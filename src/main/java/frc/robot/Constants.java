@@ -108,7 +108,8 @@ public final class Constants {
     public static final int kHoodCanId = 0;
     
     public static final double kLauncherSpeed = 0.67;
-    public static final double kHoodspeed = 0.3;
+    public static final double kHoodDownSetpoint = 0;
+    public static final double kHoodUpSetpoint = 0.5;
   }
 
   public static final class ModuleConstants {
