@@ -14,17 +14,21 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.SpindexerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
@@ -39,9 +43,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+	private final CollectorSubsystem m_collector = new CollectorSubsystem();
+	private final LauncherSubsystem m_launcher = new LauncherSubsystem();
+	private final SpindexerSubsystem m_spindexer = new SpindexerSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
 
 	// Auto chooser
 	private final SendableChooser<Command> autoChooser;
@@ -80,24 +87,26 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
+		// Launcher bindings
+		m_driverController.rightTrigger(.2).whileTrue(m_launcher.runLauncherCommand());
+
+		// Drivetrain bindings
+		m_driverController.rightBumper()
+				.whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
-    
-    new JoystickButton(m_driverController, XboxController.Button.kA.value)
-    .onTrue(new InstantCommand(
+
+		m_driverController.a()
+				.onTrue(new InstantCommand(
         () -> {
             m_robotDrive.zeroHeading();
         }, m_robotDrive));
-    
-    new JoystickButton(m_driverController, XboxController.Button.kB.value)
-    .onTrue(new InstantCommand(
+
+		m_driverController.b()
+				.onTrue(new InstantCommand(
         () -> {
-            m_robotDrive.resetEncoders();
             m_robotDrive.resetOdometry(Pose2d.kZero);
-        }
-    ));
+        }));
   }
 
   /**

@@ -12,10 +12,10 @@ public class SpindexerSubsystem extends SubsystemBase {
     private final SparkMax m_kicker = new SparkMax(SpindexerConstants.kKickerCanId, MotorType.kBrushless);
     
     public SpindexerSubsystem() {
-
+        setDefaultCommand(this.idle());
     }
 
-    public Command spindex() {
+    public Command spindexCommand() {
         return this.startEnd(
             () -> {
                 m_kicker.set(SpindexerConstants.kKickerSpeed);

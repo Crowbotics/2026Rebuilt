@@ -1,6 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.FeedbackSensor;

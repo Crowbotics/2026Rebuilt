@@ -27,6 +27,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
@@ -38,6 +39,8 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.LimelightHelpers;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -291,5 +294,28 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  public double getAimSpeed(Rotation2d targetAngle) {
+    double kP = 0.035;
+
+    return -targetAngle.minus(m_odometry.getEstimatedPosition().getRotation()).getDegrees() * kP * DriveConstants.kMaxAngularSpeed;
+  }
+
+  public Command aimCommand(Rotation2d targetAngle) {
+    return this.startEnd(
+      () -> {
+
+      },
+      () -> {
+
+      }
+    ).until(() -> {
+      return true; // TODO
+    });
+  }
+
+  public Command aimAtHubCommand() {
+    return Commands.idle(this);
   }
 }

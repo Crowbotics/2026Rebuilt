@@ -6,7 +6,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,9 +22,11 @@ public class CollectorSubsystem extends SubsystemBase {
         m_arm.configure(Configs.CollectorConfigs.armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_armController = m_arm.getClosedLoopController();
+
+        setDefaultCommand(this.idle());
     }
 
-    public Command intake() {
+    public Command runIntakeCommand() {
         return this.startEnd(
             () -> {
                 m_armController.setSetpoint(CollectorConstants.kArmExtendedSetpoint, ControlType.kPosition);

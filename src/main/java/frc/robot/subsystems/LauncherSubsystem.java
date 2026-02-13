@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.LauncherConstants;
@@ -27,18 +28,26 @@ public class LauncherSubsystem extends SubsystemBase {
         
         m_flywheelController = m_flywheel.getClosedLoopController();
         m_hoodController = m_hood.getClosedLoopController();
+
+        setDefaultCommand(this.idle());
     }
 
-    public Command launch() {
+    public Command runLauncherCommand() {
         return this.startEnd(
             () -> {
-                m_flywheelController.setSetpoint(LauncherConstants.kLauncherSpeed, ControlType.kVelocity);
+                m_flywheelController.setSetpoint(LauncherConstants.kFlywheelSpeed, ControlType.kVelocity);
                 m_hoodController.setSetpoint(LauncherConstants.kHoodUpSetpoint, ControlType.kPosition);
             },
             () -> {
                 m_flywheelController.setSetpoint(0, ControlType.kVelocity);
                 m_hoodController.setSetpoint(LauncherConstants.kHoodDownSetpoint, ControlType.kPosition);
             }
+        );
+    }
+
+    public Command alignAndShootCommand(DriveSubsystem m_robotDrive) {
+        return Commands.sequence(
+            
         );
     }
 }

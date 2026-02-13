@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.config.RobotConfig;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -14,6 +18,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -28,6 +35,40 @@ import edu.wpi.first.networktables.StructArrayPublisher;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public enum FieldPosition {
+    // Origin is to the right of the blue alliance wall
+    HUB (
+      new Translation2d(
+        Units.inchesToMeters(182.11),
+        Units.inchesToMeters(158.84)
+      ),
+      new Translation2d(
+        Units.inchesToMeters(469.11),
+        Units.inchesToMeters(158.84)
+      )
+    );
+
+    public Translation2d BlueAlliancePosition;
+    public Translation2d RedAlliancePosition;
+
+    FieldPosition(Translation2d blueAlliancePosition, Translation2d redAlliancePosition) {
+      this.BlueAlliancePosition = blueAlliancePosition;
+      this.RedAlliancePosition = redAlliancePosition;
+    }
+
+    public Translation2d getPosition() {
+      Optional<Alliance> alliance = DriverStation.getAlliance();
+      if (alliance.isPresent()) {
+        if (alliance.get() == Alliance.Blue) {
+          return this.BlueAlliancePosition;
+        } else {
+          return this.RedAlliancePosition;
+        }
+      }
+      return this.BlueAlliancePosition; // default to blue alliance if no alliance is found on DS
+    }
+  }
+
   public static final class DriveConstants {
 
     public static final RobotConfig config;
@@ -42,6 +83,8 @@ public final class Constants {
         }
         config = tempConfig;
     }
+
+    public static final double kAimTolerance = Units.degreesToRadians(5); // radians
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
@@ -107,9 +150,9 @@ public final class Constants {
     public static final int kFlywheelCanId = 0;
     public static final int kHoodCanId = 0;
     
-    public static final double kLauncherSpeed = 0.67;
-    public static final double kHoodDownSetpoint = 0;
-    public static final double kHoodUpSetpoint = 0.5;
+    public static final double kFlywheelSpeed = 0.67;
+    public static final double kHoodDownSetpoint = 0.5;
+    public static final double kHoodUpSetpoint = .2;
   }
 
   public static final class ModuleConstants {
