@@ -8,17 +8,19 @@ import java.util.Optional;
 
 import com.pathplanner.lib.config.RobotConfig;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.InterpolatingMatrixTreeMap;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -85,7 +87,8 @@ public final class Constants {
     }
 
     public static final double kAimP = 0.035;
-    public static final double kAimTolerance = 5; // degrees
+    public static final double kAimAngleTolerance = 5; // degrees
+    public static final double kAimRotationalSpeedTolerance = 2; // degrees per second
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
@@ -98,9 +101,9 @@ public final class Constants {
     public static final StructArrayPublisher<SwerveModuleState> kCurrentModuleStatesPublisher = kDriveNetworkTable.getStructArrayTopic("CurrentStates", SwerveModuleState.struct).publish();
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(21.5);
+    public static final double kTrackWidth = Units.inchesToMeters(21);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(21.5);
+    public static final double kWheelBase = Units.inchesToMeters(23);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -137,6 +140,9 @@ public final class Constants {
 
     public static final double kArmUnextendedSetpoint = 0;
     public static final double kArmExtendedSetpoint = 0;
+
+    // Arm turning factor
+    public static final double kTurningFactor = 360; // convert to degrees
   }
 
   public static final class SpindexerConstants {
@@ -150,12 +156,20 @@ public final class Constants {
   public static final class LauncherConstants {
     public static final int kFlywheelCanId = 0;
     public static final int kHoodCanId = 0;
-    
+
     public static final double kFlywheelSpeed = 0.67;
     public static final double kHoodDownSetpoint = 0.5;
     public static final double kHoodUpSetpoint = .2;
 
     public static final double kHoodAngleTolerance = 1; // degrees
+    public static final double kHoodSpeedTolerance = 0.2; // degrees per second
+
+    public static final double kTurningFactor = 360; // convert to degrees
+
+    public static final double kShooterWheelRadius = 2;
+
+    public static final double kFlywheelWindupTime = 0.77; // seconds
+    public static final double kFlywheelRunOn = 0.5; // seconds before flywheel stops
   }
 
   public static final class ModuleConstants {
@@ -200,5 +214,16 @@ public final class Constants {
   }
   public static final class NeoVortexConstants {
     public static final double kFreeSpeedRpm = 6784;
+  }
+
+  public static final class ShootingLookupTable {
+    public static final InterpolatingMatrixTreeMap<Double, N2, N1> ShootingMap = new InterpolatingMatrixTreeMap<>();
+
+    static {
+      // TODO
+      Matrix<N2, N1> matrix = new Matrix<N2, N1>(Nat.N2(), Nat.N1());
+
+      ShootingMap.put(5.0, matrix);
+    }
   }
 }

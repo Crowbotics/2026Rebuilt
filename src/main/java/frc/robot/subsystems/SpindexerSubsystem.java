@@ -20,7 +20,7 @@ public class SpindexerSubsystem extends SubsystemBase {
             () -> {
                 m_kicker.set(SpindexerConstants.kKickerSpeed);
                 m_spinner.set(SpindexerConstants.kSpinnerSpeed);
-            }, 
+            },
             () -> {
                 m_kicker.set(0);
                 m_spinner.set(0);

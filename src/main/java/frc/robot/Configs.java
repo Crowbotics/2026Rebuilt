@@ -5,6 +5,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import frc.robot.Constants.CollectorConstants;
+import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
@@ -28,7 +30,6 @@ public final class Configs {
                     .velocityConversionFactor(drivingFactor / 60.0); // meters per second
             drivingConfig.closedLoop
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                    // These are example gains you may need to them for your own robot!
                     .pid(0.01, 0.0001, 0.00)
                     //.velocityFF(drivingVelocityFeedForward + 0.003)
                     .outputRange(-1, 1)
@@ -62,11 +63,21 @@ public final class Configs {
 
         static {
                 armConfig
-                        .idleMode(IdleMode.kBrake)
-                        .closedLoop
-                                .pid(0, 0, 0)
-                                .outputRange(-1, 1)
-                                .positionWrappingEnabled(false);
+                        .idleMode(IdleMode.kBrake);
+                armConfig.closedLoop
+                        .pid(0, 0, 0)
+                        .outputRange(-1, 1)
+                        .positionWrappingEnabled(false);
+                        // Uncomment once encoder is confirmed to be working
+                        //.feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+                armConfig.alternateEncoder
+                        .velocityConversionFactor(CollectorConstants.kTurningFactor)
+                        .positionConversionFactor(CollectorConstants.kTurningFactor)
+                        // Uncomment once encoder is confirmed to be working
+                        //.setSparkMaxDataPortConfig()
+                        //.countsPerRevolution(8192)
+                        ; // Through Bore Encoder
+                        
         }
     }
 
@@ -75,17 +86,33 @@ public final class Configs {
         public static final SparkMaxConfig hoodConfig = new SparkMaxConfig();
 
         static {
+                double shooterVelocityFactor = (LauncherConstants.kShooterWheelRadius * 2 * Math.PI) / 60;
+
                 flywheelConfig
-                        .idleMode(IdleMode.kBrake)
-                        .closedLoop
-                                .pid(0, 0, 0)
-                                .outputRange(-1, 1);
+                        .idleMode(IdleMode.kBrake);
+                flywheelConfig.encoder
+                        .velocityConversionFactor(shooterVelocityFactor); // convert rotations per minute to meters per second
+                flywheelConfig.closedLoop
+                        .pid(0, 0, 0)
+                        .outputRange(-1, 1)
+                        .feedForward
+                                .kV(0.38); // volts per meters per second
+                                //.kA(0.26); // volts per meters per second squared. Not used for velocity control mode
                 
                 hoodConfig
-                        .idleMode(IdleMode.kBrake)
-                        .closedLoop
-                                .pid(0, 0, 0)
-                                .outputRange(-1, 1);
+                        .idleMode(IdleMode.kBrake);
+                hoodConfig.alternateEncoder
+                        .positionConversionFactor(LauncherConstants.kTurningFactor)
+                        .velocityConversionFactor(LauncherConstants.kTurningFactor)
+                        // Uncomment once encoder is confirmed to be working
+                        //.setSparkMaxDataPortConfig()
+                        //.countsPerRevolution(8192)
+                        ; // Through Bore Encoder
+                hoodConfig.closedLoop
+                        // Uncomment once encoder is confirmed to be working
+                        // .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+                        .pid(0, 0, 0)
+                        .outputRange(-1, 1);
         }
     }
 }

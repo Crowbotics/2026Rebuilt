@@ -88,7 +88,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 		// Launcher bindings
-		m_driverController.rightTrigger(.2).whileTrue(m_launcher.runLauncherCommand(null, null));
+		m_driverController.rightTrigger(.2).whileTrue(m_launcher.runFlywheelCommand(null));
 
 		// Drivetrain bindings
 		m_driverController.rightBumper()

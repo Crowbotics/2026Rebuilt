@@ -9,6 +9,8 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
 import java.io.OutputStream;
 
+import org.opencv.core.Mat;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.PIDConstants;
@@ -303,7 +305,9 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getAimSpeed(Rotation2d targetAngle) {
-    return -targetAngle.minus(getBotRotation2d()).getDegrees() * DriveConstants.kAimP * DriveConstants.kMaxAngularSpeed;
+    double error = targetAngle.minus(getBotRotation2d()).getDegrees();
+
+    return -error * DriveConstants.kAimP * DriveConstants.kMaxAngularSpeed;
   }
 
   public Command aimCommand(Translation2d target) {
@@ -318,7 +322,14 @@ public class DriveSubsystem extends SubsystemBase {
         drive(0, 0, 0, false);
       }
     ).until(() -> {
-      if (Math.abs(targetAngle.minus(getBotRotation2d()).getDegrees()) <= DriveConstants.kAimTolerance) {
+      ChassisSpeeds robotSpeeds = DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
+
+      if (
+        // is aiming enough in the right direction
+        Math.abs(targetAngle.minus(getBotRotation2d()).getDegrees()) <= DriveConstants.kAimAngleTolerance &&
+        // is still enough
+        Math.abs(Units.radiansToDegrees(robotSpeeds.omegaRadiansPerSecond)) <= DriveConstants.kAimRotationalSpeedTolerance
+      ) {
         return true;
       }
       return false;
