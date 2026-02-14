@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import java.io.ObjectInputFilter.Config;
+import java.util.Optional;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -32,11 +33,16 @@ public class LauncherSubsystem extends SubsystemBase {
         setDefaultCommand(this.idle());
     }
 
-    public Command runLauncherCommand() {
+    @Override
+    public void periodic() {
+
+    }
+
+    public Command runLauncherCommand(Optional<Double> speed, Optional<Double> angle) {
         return this.startEnd(
             () -> {
-                m_flywheelController.setSetpoint(LauncherConstants.kFlywheelSpeed, ControlType.kVelocity);
-                m_hoodController.setSetpoint(LauncherConstants.kHoodUpSetpoint, ControlType.kPosition);
+                m_flywheelController.setSetpoint(speed.isPresent() ? speed.get() : LauncherConstants.kFlywheelSpeed, ControlType.kVelocity);
+                m_hoodController.setSetpoint(angle.isPresent() ? angle.get() : LauncherConstants.kHoodUpSetpoint, ControlType.kPosition);
             },
             () -> {
                 m_flywheelController.setSetpoint(0, ControlType.kVelocity);
@@ -45,9 +51,31 @@ public class LauncherSubsystem extends SubsystemBase {
         );
     }
 
+    public Command setHoodAngleCommand(double angle) {
+        return this.runOnce(
+            () -> {
+                m_hoodController.setSetpoint(angle, ControlType.kPosition);
+            }
+        );
+    }
+
+    public Command waitForHoodAngleChangeCommand() {
+        return this.idle().until(
+            () -> {
+                if (Math.abs(m_hood.getAbsoluteEncoder().getPosition()) <= LauncherConstants.kHoodAngleTolerance) {
+                    return true;
+                }
+                return false;
+            }
+        );
+    }
+
     public Command alignAndShootCommand(DriveSubsystem m_robotDrive) {
         return Commands.sequence(
-            
+            setHoodAngleCommand(30),
+            m_robotDrive.aimAtHubCommand(),
+            waitForHoodAngleChangeCommand(),
+            runLauncherCommand(null, null)
         );
     }
 }

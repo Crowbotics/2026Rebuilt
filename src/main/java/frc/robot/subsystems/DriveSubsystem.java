@@ -22,6 +22,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -38,6 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldPosition;
 import frc.robot.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -287,6 +289,10 @@ public class DriveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(-m_gyro.getAngle()).getDegrees();
   }
 
+  public Rotation2d getBotRotation2d() {
+    return m_odometry.getEstimatedPosition().getRotation();
+  }
+
   /**
    * Returns the turn rate of the robot.
    *
@@ -297,25 +303,29 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getAimSpeed(Rotation2d targetAngle) {
-    double kP = 0.035;
-
-    return -targetAngle.minus(m_odometry.getEstimatedPosition().getRotation()).getDegrees() * kP * DriveConstants.kMaxAngularSpeed;
+    return -targetAngle.minus(getBotRotation2d()).getDegrees() * DriveConstants.kAimP * DriveConstants.kMaxAngularSpeed;
   }
 
-  public Command aimCommand(Rotation2d targetAngle) {
-    return this.startEnd(
-      () -> {
+  public Command aimCommand(Translation2d target) {
+    // Find the direction the robot needs to face
+    Rotation2d targetAngle = target.minus(m_odometry.getEstimatedPosition().getTranslation()).getAngle();
 
+    return this.runEnd(
+      () -> {
+        drive(0, 0, getAimSpeed(targetAngle), false);
       },
       () -> {
-
+        drive(0, 0, 0, false);
       }
     ).until(() -> {
-      return true; // TODO
+      if (Math.abs(targetAngle.minus(getBotRotation2d()).getDegrees()) <= DriveConstants.kAimTolerance) {
+        return true;
+      }
+      return false;
     });
   }
 
   public Command aimAtHubCommand() {
-    return Commands.idle(this);
+    return aimCommand(FieldPosition.HUB.getCurrentAlliance());
   }
 }

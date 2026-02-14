@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public enum FieldPosition {
+  public static enum FieldPosition {
     // Origin is to the right of the blue alliance wall
     HUB (
       new Translation2d(
@@ -56,7 +56,7 @@ public final class Constants {
       this.RedAlliancePosition = redAlliancePosition;
     }
 
-    public Translation2d getPosition() {
+    public Translation2d getCurrentAlliance() {
       Optional<Alliance> alliance = DriverStation.getAlliance();
       if (alliance.isPresent()) {
         if (alliance.get() == Alliance.Blue) {
@@ -84,7 +84,8 @@ public final class Constants {
         config = tempConfig;
     }
 
-    public static final double kAimTolerance = Units.degreesToRadians(5); // radians
+    public static final double kAimP = 0.035;
+    public static final double kAimTolerance = 5; // degrees
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
@@ -153,6 +154,8 @@ public final class Constants {
     public static final double kFlywheelSpeed = 0.67;
     public static final double kHoodDownSetpoint = 0.5;
     public static final double kHoodUpSetpoint = .2;
+
+    public static final double kHoodAngleTolerance = 1; // degrees
   }
 
   public static final class ModuleConstants {
