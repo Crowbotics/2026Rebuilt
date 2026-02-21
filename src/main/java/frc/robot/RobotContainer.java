@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -46,6 +47,8 @@ public class RobotContainer {
 	private final CollectorSubsystem m_collector = new CollectorSubsystem();
 	private final LauncherSubsystem m_launcher = new LauncherSubsystem();
 	private final SpindexerSubsystem m_spindexer = new SpindexerSubsystem();
+
+  //private final RobotCommands m_commands = new RobotCommands(m_robotDrive, m_launcher, m_spindexer, m_collector);
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -70,9 +73,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                -Math.pow(MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),2),
+                -Math.pow(MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),2),
+                -Math.pow(MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),2),
                 true),
             m_robotDrive));
   }
@@ -87,8 +90,17 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Collector bindings
+    m_driverController.x().whileTrue(m_collector.runIntakeCommand());
+
+    // Spindexer bindings
+    m_driverController.leftTrigger(.2).whileTrue(m_spindexer.spindexCommand());
+
 		// Launcher bindings
-		m_driverController.rightTrigger(.2).whileTrue(m_launcher.runFlywheelCommand(null));
+		m_driverController.rightTrigger(.2).whileTrue(m_launcher.runFlywheelCommand(Optional.empty()));
+
+    // Aim and shoot binding
+    //m_driverController.b().onTrue(m_commands.alignAndShootRelativeCommand());
 
 		// Drivetrain bindings
 		m_driverController.rightBumper()
@@ -102,10 +114,10 @@ public class RobotContainer {
             m_robotDrive.zeroHeading();
         }, m_robotDrive));
 
-		m_driverController.b()
+		m_driverController.y()
 				.onTrue(new InstantCommand(
         () -> {
-            m_robotDrive.resetOdometry(Pose2d.kZero);
+            m_robotDrive.zeroHeading();
         }));
   }
 

@@ -36,6 +36,21 @@ public class RobotCommands {
         this.m_collector = m_collector;
     }
 
+    public Command alignAndShootRelativeCommand() {
+        return Commands.sequence(
+            m_launcher.setHoodAngleCommand(LauncherConstants.kHoodTargetRelativeSetpoint),
+            m_robotDrive.aimAtHubRelativeCommand(),
+            m_launcher.runFlywheelCommand(Optional.empty()),
+            m_spindexer.spindexCommand()
+        )
+        
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        
+        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(
+            Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).raceWith(m_robotDrive.idle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        ));
+    }
+
     public Command alignAndShootCommand() {
         double distanceFromHub = FieldPosition.HUB.getCurrentAlliance().getDistance(m_robotDrive.getPose().getTranslation());
         Matrix<N2, N1> speedAndAngle = ShootingLookupTable.ShootingMap.get(distanceFromHub);

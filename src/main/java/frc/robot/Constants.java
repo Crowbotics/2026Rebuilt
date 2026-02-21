@@ -133,8 +133,8 @@ public final class Constants {
 
   public static final class CollectorConstants {
     // CAN IDs
-    public static final int kArmCanId = 0;
-    public static final int kRollerCanId = 0;
+    public static final int kArmCanId = 9;
+    public static final int kRollerCanId = 10;
 
     public static final double kRollerSpeed = 0.5;
 
@@ -146,20 +146,20 @@ public final class Constants {
   }
 
   public static final class SpindexerConstants {
-    public static final int kSpinnerCanId = 0;
-    public static final int kKickerCanId = 0;
+    public static final int kSpinnerCanId = 11;
+    public static final int kKickerCanId = 12;
 
-    public static final double kSpinnerSpeed = 0.5;
-    public static final double kKickerSpeed = 0.5;
+    public static final double kSpinnerSpeed = 0.1;
+    public static final double kKickerSpeed = 0.1;
   }
 
   public static final class LauncherConstants {
-    public static final int kFlywheelCanId = 0;
-    public static final int kHoodCanId = 0;
+    public static final int kFlywheelCanId1 = 13;
+    public static final int kFlywheelCanId2 = 15;
+    public static final int kHoodCanId = 14;
 
-    public static final double kFlywheelSpeed = 0.67;
-    public static final double kHoodDownSetpoint = 0.5;
-    public static final double kHoodUpSetpoint = .2;
+    public static final double kFlywheelSpeed = 1; // meters per second
+    public static final double kHoodTargetRelativeSetpoint = 0.5;
 
     public static final double kHoodAngleTolerance = 1; // degrees
     public static final double kHoodSpeedTolerance = 0.2; // degrees per second
@@ -207,6 +207,10 @@ public final class Constants {
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }
+
+  public static class LimelightNames {
+    public static final String kLauncherLimelight = "";
   }
 
   public static final class NeoMotorConstants {

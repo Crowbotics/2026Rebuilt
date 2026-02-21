@@ -82,7 +82,8 @@ public final class Configs {
     }
 
     public static final class LauncherConfigs {
-        public static final SparkMaxConfig flywheelConfig = new SparkMaxConfig();
+        public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
+        public static final SparkFlexConfig flywheelConfig2 = new SparkFlexConfig();
         public static final SparkMaxConfig hoodConfig = new SparkMaxConfig();
 
         static {
@@ -98,10 +99,10 @@ public final class Configs {
                         .feedForward
                                 .kV(0.38); // volts per meters per second
                                 //.kA(0.26); // volts per meters per second squared. Not used for velocity control mode
-                
+
                 hoodConfig
                         .idleMode(IdleMode.kBrake);
-                hoodConfig.alternateEncoder
+                hoodConfig.absoluteEncoder
                         .positionConversionFactor(LauncherConstants.kTurningFactor)
                         .velocityConversionFactor(LauncherConstants.kTurningFactor)
                         // Uncomment once encoder is confirmed to be working

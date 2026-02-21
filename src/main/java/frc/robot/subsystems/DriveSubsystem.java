@@ -42,6 +42,7 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldPosition;
+import frc.robot.Constants.LimelightNames;
 import frc.robot.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -175,8 +176,10 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-  
+        
     // Update pose with limelights
+    // Disabled for week 0
+    /*
     boolean doRejectUpdate = false;
     LimelightHelpers.SetRobotOrientation("", m_odometry.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
@@ -195,6 +198,7 @@ public class DriveSubsystem extends SubsystemBase {
           mt2.pose,
           mt2.timestampSeconds);
     }
+    */
   }
 
   /**
@@ -279,7 +283,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    m_gyro.zeroYaw();;
   }
 
   /**
@@ -302,6 +306,37 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  // For week 0, we will focus on simply aiming towards the hub
+  // using a limelight
+  public double getAimSpeedRelative() {
+    double error = LimelightHelpers.getTX(LimelightNames.kLauncherLimelight);
+
+    return -error * DriveConstants.kAimP * DriveConstants.kMaxAngularSpeed;
+  }
+
+  public Command aimAtHubRelativeCommand() {
+    return this.runEnd(
+      () -> {
+        drive(0, 0, getAimSpeedRelative(), false);
+      },
+      () -> {
+        drive(0, 0, 0, false);
+      }
+    ).until(() -> {
+      ChassisSpeeds robotSpeeds = DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
+
+      if (
+        // is aiming enough in the right direction
+        Math.abs(LimelightHelpers.getTX(LimelightNames.kLauncherLimelight)) <= DriveConstants.kAimAngleTolerance &&
+        // is still enough
+        Math.abs(Units.radiansToDegrees(robotSpeeds.omegaRadiansPerSecond)) <= DriveConstants.kAimRotationalSpeedTolerance
+      ) {
+        return true;
+      }
+      return false;
+    });
   }
 
   public double getAimSpeed(Rotation2d targetAngle) {
