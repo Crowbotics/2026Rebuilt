@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -48,7 +49,7 @@ public class RobotContainer {
 	private final LauncherSubsystem m_launcher = new LauncherSubsystem();
 	private final SpindexerSubsystem m_spindexer = new SpindexerSubsystem();
 
-  //private final RobotCommands m_commands = new RobotCommands(m_robotDrive, m_launcher, m_spindexer, m_collector);
+  private final RobotCommands m_commands = new RobotCommands(m_robotDrive, m_launcher, m_spindexer, m_collector);
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -73,9 +74,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -Math.pow(MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),2),
-                -Math.pow(MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),2),
-                -Math.pow(MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),2),
+                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
   }
@@ -97,7 +98,9 @@ public class RobotContainer {
     m_driverController.leftTrigger(.2).whileTrue(m_spindexer.spindexCommand());
 
 		// Launcher bindings
-		m_driverController.rightTrigger(.2).whileTrue(m_launcher.runFlywheelCommand(Optional.empty()));
+		m_driverController.leftBumper().whileTrue(m_launcher.runFlywheelCommand(Optional.empty()));
+
+    m_driverController.rightTrigger(.2).debounce(0.2).whileTrue(m_commands.spindexAndShootCommand());
 
     // Aim and shoot binding
     //m_driverController.b().onTrue(m_commands.alignAndShootRelativeCommand());

@@ -149,8 +149,8 @@ public final class Constants {
     public static final int kSpinnerCanId = 11;
     public static final int kKickerCanId = 12;
 
-    public static final double kSpinnerSpeed = 0.1;
-    public static final double kKickerSpeed = 0.1;
+    public static final double kSpinnerSpeed = 0.7; // percent
+    public static final double kKickerSpeed = 0.7; // percent
   }
 
   public static final class LauncherConstants {
@@ -158,7 +158,8 @@ public final class Constants {
     public static final int kFlywheelCanId2 = 15;
     public static final int kHoodCanId = 14;
 
-    public static final double kFlywheelSpeed = 1; // meters per second
+    public static final double kFlywheelSpeed = 2.7; // meters per second
+
     public static final double kHoodTargetRelativeSetpoint = 0.5;
 
     public static final double kHoodAngleTolerance = 1; // degrees

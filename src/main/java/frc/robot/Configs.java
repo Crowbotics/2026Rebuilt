@@ -65,12 +65,13 @@ public final class Configs {
                 armConfig
                         .idleMode(IdleMode.kBrake);
                 armConfig.closedLoop
+                        .positionWrappingEnabled(false)
                         .pid(0, 0, 0)
                         .outputRange(-1, 1)
                         .positionWrappingEnabled(false);
                         // Uncomment once encoder is confirmed to be working
                         //.feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
-                armConfig.alternateEncoder
+                armConfig.absoluteEncoder
                         .velocityConversionFactor(CollectorConstants.kTurningFactor)
                         .positionConversionFactor(CollectorConstants.kTurningFactor)
                         // Uncomment once encoder is confirmed to be working
@@ -90,11 +91,12 @@ public final class Configs {
                 double shooterVelocityFactor = (LauncherConstants.kShooterWheelRadius * 2 * Math.PI) / 60;
 
                 flywheelConfig
+                        .inverted(true)
                         .idleMode(IdleMode.kBrake);
                 flywheelConfig.encoder
                         .velocityConversionFactor(shooterVelocityFactor); // convert rotations per minute to meters per second
                 flywheelConfig.closedLoop
-                        .pid(0, 0, 0)
+                        .pid(0.001, 0, 0)
                         .outputRange(-1, 1)
                         .feedForward
                                 .kV(0.38); // volts per meters per second

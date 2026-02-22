@@ -18,7 +18,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         setDefaultCommand(this.idle());
 
         SparkMaxConfig spinnerConfig = new SparkMaxConfig();
-        spinnerConfig.inverted(true);
+        spinnerConfig.inverted(false);
         m_spinner.configure(spinnerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 

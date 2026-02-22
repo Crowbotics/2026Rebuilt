@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -49,6 +50,14 @@ public class LauncherSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
+
+        setDefaultCommand(this.run(
+            () -> {
+                if (m_flywheelController.getSetpoint() != 0.0) {
+                    CommandScheduler.getInstance().schedule(stopFlywheelCommand());
+                }
+            }
+        ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
     public Command runFlywheelCommand(Optional<Double> speed) {
@@ -57,16 +66,17 @@ public class LauncherSubsystem extends SubsystemBase {
                 m_flywheelController.setSetpoint(speed.isPresent() ? speed.get() : LauncherConstants.kFlywheelSpeed, ControlType.kVelocity);
             }
         )
-        .andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime))
+        .withName("Run Flywheel")
+        .andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime));
         // Flywheel is run for a little longer on end to ensure that all balls
         // in the system have been cleared
-        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(stopFlywheelCommand()));
+        //.handleInterrupt(() -> CommandScheduler.getInstance().schedule(stopFlywheelCommand()));
     }
 
     public Command stopFlywheelCommand() {
         return Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).andThen(
             this.runOnce(() -> m_flywheelController.setSetpoint(0, ControlType.kVelocity))
-        );
+        ).withName("Stop Flywheel");
     }
 
     public Command setHoodAngleCommand(double angle) {
