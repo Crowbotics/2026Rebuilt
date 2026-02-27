@@ -139,7 +139,7 @@ public final class Constants {
     public static final double kRollerSpeed = 0.5;
 
     public static final double kArmUnextendedSetpoint = 0;
-    public static final double kArmExtendedSetpoint = 0;
+    public static final double kArmExtendedSetpoint = 252;
 
     // Arm turning factor
     public static final double kTurningFactor = 360; // convert to degrees
@@ -149,8 +149,8 @@ public final class Constants {
     public static final int kSpinnerCanId = 11;
     public static final int kKickerCanId = 12;
 
-    public static final double kSpinnerSpeed = 0.7; // percent
-    public static final double kKickerSpeed = 0.7; // percent
+    public static final double kSpinnerSpeed = 1; // percent
+    public static final double kKickerSpeed = 1; // percent
   }
 
   public static final class LauncherConstants {
@@ -164,6 +164,9 @@ public final class Constants {
 
     public static final double kHoodAngleTolerance = 1; // degrees
     public static final double kHoodSpeedTolerance = 0.2; // degrees per second
+
+    public static final double kHoodZero = 0.062;
+    public static final double kHoodExtended = 1.37;
 
     public static final double kTurningFactor = 360; // convert to degrees
 

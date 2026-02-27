@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -23,7 +24,7 @@ public final class Configs {
 
             drivingConfig
                     .idleMode(IdleMode.kBrake)
-                    .inverted(true)
+                    .inverted(false)
                     .smartCurrentLimit(50);
             drivingConfig.encoder
                     .positionConversionFactor(drivingFactor) // meters
@@ -63,17 +64,22 @@ public final class Configs {
 
         static {
                 armConfig
-                        .idleMode(IdleMode.kBrake);
+                        .idleMode(IdleMode.kBrake)
+                        .inverted(true);
+                /*armConfig.softLimit
+                        .reverseSoftLimit(359)
+                        .reverseSoftLimitEnabled(true);*/
                 armConfig.closedLoop
-                        .positionWrappingEnabled(false)
-                        .pid(0, 0, 0)
+                        .pid(0.0012, 0, 0)
                         .outputRange(-1, 1)
-                        .positionWrappingEnabled(false);
-                        // Uncomment once encoder is confirmed to be working
-                        //.feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+                        .positionWrappingEnabled(false)
+                        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                        ;
                 armConfig.absoluteEncoder
                         .velocityConversionFactor(CollectorConstants.kTurningFactor)
                         .positionConversionFactor(CollectorConstants.kTurningFactor)
+                        .zeroOffset(133/360.0)
+                        .inverted(true);
                         // Uncomment once encoder is confirmed to be working
                         //.setSparkMaxDataPortConfig()
                         //.countsPerRevolution(8192)
@@ -92,7 +98,7 @@ public final class Configs {
 
                 flywheelConfig
                         .inverted(true)
-                        .idleMode(IdleMode.kBrake);
+                        .idleMode(IdleMode.kCoast);
                 flywheelConfig.encoder
                         .velocityConversionFactor(shooterVelocityFactor); // convert rotations per minute to meters per second
                 flywheelConfig.closedLoop
@@ -103,19 +109,22 @@ public final class Configs {
                                 //.kA(0.26); // volts per meters per second squared. Not used for velocity control mode
 
                 hoodConfig
-                        .idleMode(IdleMode.kBrake);
+                        .idleMode(IdleMode.kCoast);
+                hoodConfig.encoder
+                        .positionConversionFactor(1.0/12.0)
+                        .velocityConversionFactor(1)
+                        ;
                 hoodConfig.absoluteEncoder
-                        .positionConversionFactor(LauncherConstants.kTurningFactor)
-                        .velocityConversionFactor(LauncherConstants.kTurningFactor)
-                        // Uncomment once encoder is confirmed to be working
-                        //.setSparkMaxDataPortConfig()
-                        //.countsPerRevolution(8192)
-                        ; // Through Bore Encoder
+                        .positionConversionFactor(1.0)
+                        .velocityConversionFactor(1.0)
+                        .inverted(true)
+                        .zeroOffset(0.9)
+                        ;
                 hoodConfig.closedLoop
-                        // Uncomment once encoder is confirmed to be working
-                        // .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-                        .pid(0, 0, 0)
-                        .outputRange(-1, 1);
+                        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                        .pid(0.5, 0, 0)
+                        .allowedClosedLoopError(0.025, ClosedLoopSlot.kSlot0)
+                        ;
         }
     }
 }

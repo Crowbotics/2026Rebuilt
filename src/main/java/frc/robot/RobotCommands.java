@@ -36,14 +36,16 @@ public class RobotCommands {
         this.m_collector = m_collector;
     }
 
-    public Command spindexAndShootCommand() {
+    public Command spindexAndShootCommand(double flywheelSpeed, double hoodAngle) {
         return Commands.sequence(
-            m_launcher.runFlywheelCommand(Optional.empty()),
+            m_launcher.setHoodAngleAndWaitCommand(hoodAngle),
+            m_launcher.runFlywheelCommand(Optional.of(flywheelSpeed)),
             m_spindexer.spindexCommand()
         )
         
         .handleInterrupt(() -> CommandScheduler.getInstance().schedule(
             Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).raceWith(m_robotDrive.idle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            .andThen(m_launcher.setHoodAngleCommand(LauncherConstants.kHoodZero))
         ));
     }
 

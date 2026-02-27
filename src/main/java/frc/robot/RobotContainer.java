@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -92,40 +93,32 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Collector bindings
-    m_driverController.x().whileTrue(m_collector.runIntakeCommand());
+    m_driverController.x().onTrue(m_collector.setArmAngleCommand(260));
+    m_driverController.y().onTrue(m_collector.setArmAngleCommand(21));
+    m_driverController.rightBumper().whileTrue(m_collector.runIntakeCommand());
 
     // Spindexer bindings
-    m_driverController.leftTrigger(.2).whileTrue(m_spindexer.spindexCommand());
+    
 
 		// Launcher bindings
 		m_driverController.leftBumper().whileTrue(m_launcher.runFlywheelCommand(Optional.empty()));
 
-    m_driverController.rightTrigger(.2).debounce(0.2).whileTrue(m_commands.spindexAndShootCommand());
+    m_driverController.rightTrigger(.2).debounce(0.2).whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFlywheelSpeed, 0.5));
+    m_driverController.leftTrigger(.2).debounce(0.2).whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFlywheelSpeed, 1.2));
 
     // Aim and shoot binding
     //m_driverController.b().onTrue(m_commands.alignAndShootRelativeCommand());
-
-		// Drivetrain bindings
-		m_driverController.rightBumper()
-				.whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
 
 		m_driverController.a()
 				.onTrue(new InstantCommand(
         () -> {
             m_robotDrive.zeroHeading();
         }, m_robotDrive));
-
-		m_driverController.y()
-				.onTrue(new InstantCommand(
-        () -> {
-            m_robotDrive.zeroHeading();
-        }));
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
+   * Use this to 
+   * pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */

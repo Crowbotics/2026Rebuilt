@@ -37,6 +37,14 @@ public class CollectorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Arm Encoder", m_armEncoder.getPosition());
     }
 
+    public Command setArmAngleCommand(double angle) {
+        return this.runOnce(
+            () -> {
+                m_armController.setSetpoint(angle, ControlType.kPosition);
+            }
+        );
+    }
+
     public Command runIntakeCommand() {
         return this.startEnd(
             () -> {

@@ -123,6 +123,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Angle", getHeading());
     SmartDashboard.putNumber("Raw Gyro Angle", m_gyro.getAngle());
+    SmartDashboard.putNumber("Angle Radians", getBotRotation2d().getRadians());
 
     // Update the odometry in the periodic block
     updateOdometry();
@@ -169,7 +170,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void updateOdometry() {
     m_odometry.update(
-        Rotation2d.fromDegrees(getHeading()),
+        Rotation2d.fromDegrees(-m_gyro.getAngle()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -283,7 +284,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.zeroYaw();;
+    m_gyro.zeroYaw();
   }
 
   /**

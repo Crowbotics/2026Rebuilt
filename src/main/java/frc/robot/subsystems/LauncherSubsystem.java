@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,19 +31,23 @@ public class LauncherSubsystem extends SubsystemBase {
     private final SparkFlex m_flywheel2 = new SparkFlex(LauncherConstants.kFlywheelCanId2, MotorType.kBrushless);
     private final SparkMax m_hood = new SparkMax(LauncherConstants.kHoodCanId,MotorType.kBrushless);
 
-    private final AbsoluteEncoder m_hoodEncoder = m_hood.getAbsoluteEncoder();
+    private final RelativeEncoder m_hoodEncoder = m_hood.getEncoder();
+    private final AbsoluteEncoder m_hoodAbsoluteEncoder = m_hood.getAbsoluteEncoder();
 
     private final SparkClosedLoopController m_flywheelController = m_flywheel1.getClosedLoopController();
     private final SparkClosedLoopController m_hoodController = m_hood.getClosedLoopController();
 
     public LauncherSubsystem() {
         SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
+        flywheelFollowerConfig.idleMode(IdleMode.kCoast);
         flywheelFollowerConfig.follow(m_flywheel1, true);
         m_flywheel2.configure(flywheelFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_flywheel1.configure(Configs.LauncherConfigs.flywheelConfig , ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
 
-        //m_hood.configure(Configs.LauncherConfigs.hoodConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        m_hood.configure(Configs.LauncherConfigs.hoodConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+
+        m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition());
 
         setDefaultCommand(this.idle());
     }
@@ -50,6 +55,7 @@ public class LauncherSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
+        SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
 
         setDefaultCommand(this.run(
             () -> {
@@ -85,6 +91,16 @@ public class LauncherSubsystem extends SubsystemBase {
                 m_hoodController.setSetpoint(angle, ControlType.kPosition);
             }
         );
+    }
+
+    public Command setHoodAngleAndWaitCommand(double angle) {
+        return this.runOnce(
+            () -> {
+                m_hoodController.setSetpoint(angle, ControlType.kPosition);
+            }
+        ).andThen(this.idle().until(() -> {
+            return m_hoodController.isAtSetpoint();
+        }));
     }
 
     public Command waitForHoodAngleChangeCommand() {
