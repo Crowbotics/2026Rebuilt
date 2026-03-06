@@ -37,6 +37,8 @@ public class LauncherSubsystem extends SubsystemBase {
     private final SparkClosedLoopController m_flywheelController = m_flywheel1.getClosedLoopController();
     private final SparkClosedLoopController m_hoodController = m_hood.getClosedLoopController();
 
+    private final boolean zeroedHeading = false;
+
     public LauncherSubsystem() {
         SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
         flywheelFollowerConfig.idleMode(IdleMode.kCoast);
@@ -49,14 +51,7 @@ public class LauncherSubsystem extends SubsystemBase {
 
         m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition());
 
-        setDefaultCommand(this.idle());
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
-        SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
-
+        /*
         setDefaultCommand(this.run(
             () -> {
                 if (m_flywheelController.getSetpoint() != 0.0) {
@@ -64,6 +59,13 @@ public class LauncherSubsystem extends SubsystemBase {
                 }
             }
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        */
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
+        SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
     }
 
     public Command runFlywheelCommand(Optional<Double> speed) {
@@ -86,6 +88,10 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public Command setHoodAngleCommand(double angle) {
+        if (!zeroedHeading) {
+            m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition());
+        }
+
         return this.runOnce(
             () -> {
                 m_hoodController.setSetpoint(angle, ControlType.kPosition);
@@ -99,7 +105,10 @@ public class LauncherSubsystem extends SubsystemBase {
                 m_hoodController.setSetpoint(angle, ControlType.kPosition);
             }
         ).andThen(this.idle().until(() -> {
-            return m_hoodController.isAtSetpoint();
+            if (Math.abs(m_hoodEncoder.getPosition()) <= LauncherConstants.kHoodAngleTolerance) {
+                return true;
+            }
+            return false;
         }));
     }
 

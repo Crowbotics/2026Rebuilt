@@ -31,14 +31,14 @@ public final class Configs {
                     .velocityConversionFactor(drivingFactor / 60.0); // meters per second
             drivingConfig.closedLoop
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                    .pid(0.01, 0.0001, 0.00)
+                    .pid(0.01, 0.0, 0.00)
                     //.velocityFF(drivingVelocityFeedForward + 0.003)
                     .outputRange(-1, 1)
                     .feedForward.kV(drivingVelocityFeedForward + 0.003);
 
             turningConfig
-                    .idleMode(IdleMode.kBrake)
-                    .smartCurrentLimit(20);
+                    .idleMode(IdleMode.kBrake);
+                //     .smartCurrentLimit(20);
             turningConfig.absoluteEncoder
                     // Invert the turning encoder, since the output shaft rotates in the opposite
                     // direction of the steering motor in the MAXSwerve Module.
@@ -78,7 +78,7 @@ public final class Configs {
                 armConfig.absoluteEncoder
                         .velocityConversionFactor(CollectorConstants.kTurningFactor)
                         .positionConversionFactor(CollectorConstants.kTurningFactor)
-                        .zeroOffset(133/360.0)
+                        .zeroOffset(0.0/360.0)
                         .inverted(true);
                         // Uncomment once encoder is confirmed to be working
                         //.setSparkMaxDataPortConfig()

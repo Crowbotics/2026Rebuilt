@@ -86,7 +86,7 @@ public final class Constants {
         config = tempConfig;
     }
 
-    public static final double kAimP = 0.035;
+    public static final double kAimP = 0.003;
     public static final double kAimAngleTolerance = 5; // degrees
     public static final double kAimRotationalSpeedTolerance = 2; // degrees per second
 
@@ -136,7 +136,7 @@ public final class Constants {
     public static final int kArmCanId = 9;
     public static final int kRollerCanId = 10;
 
-    public static final double kRollerSpeed = 0.5;
+    public static final double kRollerSpeed = 0.8; // percent
 
     public static final double kArmUnextendedSetpoint = 0;
     public static final double kArmExtendedSetpoint = 252;
@@ -214,7 +214,7 @@ public final class Constants {
   }
 
   public static class LimelightNames {
-    public static final String kLauncherLimelight = "";
+    public static final String kLauncherLimelight = "limelight";
   }
 
   public static final class NeoMotorConstants {

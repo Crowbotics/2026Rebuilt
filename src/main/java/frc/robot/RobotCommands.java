@@ -46,6 +46,7 @@ public class RobotCommands {
         .handleInterrupt(() -> CommandScheduler.getInstance().schedule(
             Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).raceWith(m_robotDrive.idle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
             .andThen(m_launcher.setHoodAngleCommand(LauncherConstants.kHoodZero))
+            .andThen(m_launcher.stopFlywheelCommand())
         ));
     }
 

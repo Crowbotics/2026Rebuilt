@@ -93,21 +93,22 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Collector bindings
-    m_driverController.x().onTrue(m_collector.setArmAngleCommand(260));
-    m_driverController.y().onTrue(m_collector.setArmAngleCommand(21));
+    // 180.5
+    m_driverController.x().onTrue(m_collector.setArmAngleCommand(337.5));
+    m_driverController.y().onTrue(m_collector.setArmAngleCommand(98.3));
     m_driverController.rightBumper().whileTrue(m_collector.runIntakeCommand());
 
     // Spindexer bindings
     
 
 		// Launcher bindings
-		m_driverController.leftBumper().whileTrue(m_launcher.runFlywheelCommand(Optional.empty()));
+		//m_driverController.leftBumper().whileTrue(m_launcher.runFlywheelCommand(Optional.empty()));
 
     m_driverController.rightTrigger(.2).debounce(0.2).whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFlywheelSpeed, 0.5));
     m_driverController.leftTrigger(.2).debounce(0.2).whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFlywheelSpeed, 1.2));
 
     // Aim and shoot binding
-    //m_driverController.b().onTrue(m_commands.alignAndShootRelativeCommand());
+    m_driverController.b().whileTrue(m_robotDrive.aimAtHubRelativeCommand());
 
 		m_driverController.a()
 				.onTrue(new InstantCommand(
