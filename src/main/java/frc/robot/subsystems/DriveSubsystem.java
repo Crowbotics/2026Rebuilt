@@ -8,6 +8,8 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
 import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import org.opencv.core.Mat;
 
@@ -338,6 +340,35 @@ public class DriveSubsystem extends SubsystemBase {
       }
       return false;
     });
+  }
+
+  // Not tested
+  private final double kLauncherDistanceFromRobotCenter = 0.5; // meters
+  private double getLauncherAngleToHub(double robotAngle, Pose2d robotPose) {
+    return robotAngle - Math.atan2(
+      FieldPosition.HUB.getCurrentAlliance().getY() - robotPose.getY() - kLauncherDistanceFromRobotCenter * Math.sin(robotAngle),
+      FieldPosition.HUB.getCurrentAlliance().getX() - robotPose.getX() - kLauncherDistanceFromRobotCenter * Math.cos(robotAngle)
+    );
+  }
+
+  // Not tested
+  public Rotation2d getAngleToHub() {
+    double lowerBound = -Math.PI;
+    double upperBound = Math.PI;
+
+    Pose2d robotPose = m_odometry.getEstimatedPosition();
+
+    while (true) {
+      double midpoint = (lowerBound + upperBound) / 2;
+      double launcherAngleToHub = getLauncherAngleToHub(midpoint, robotPose);
+      if (launcherAngleToHub < 0.1) {
+        return Rotation2d.fromRadians(midpoint);
+      } else if (launcherAngleToHub * getLauncherAngleToHub(lowerBound, robotPose) < 0) {
+        upperBound = midpoint;
+      } else {
+        lowerBound = midpoint;
+      }
+    }
   }
 
   public double getAimSpeed(Rotation2d targetAngle) {
