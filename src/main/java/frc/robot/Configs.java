@@ -78,7 +78,7 @@ public final class Configs {
                 armConfig.absoluteEncoder
                         .velocityConversionFactor(CollectorConstants.kTurningFactor)
                         .positionConversionFactor(CollectorConstants.kTurningFactor)
-                        .zeroOffset(0.0/360.0)
+                        .zeroOffset(100.0/360.0)
                         .inverted(true);
                         // Uncomment once encoder is confirmed to be working
                         //.setSparkMaxDataPortConfig()
@@ -111,7 +111,7 @@ public final class Configs {
                 hoodConfig
                         .idleMode(IdleMode.kCoast);
                 hoodConfig.encoder
-                        .positionConversionFactor(1.0/12.0)
+                        .positionConversionFactor((1.0/12.0) * 23.0)
                         .velocityConversionFactor(1)
                         ;
                 hoodConfig.absoluteEncoder
@@ -122,7 +122,7 @@ public final class Configs {
                         ;
                 hoodConfig.closedLoop
                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                        .pid(0.5, 0, 0)
+                        .pid(0.1, 0, 0)
                         .allowedClosedLoopError(0.025, ClosedLoopSlot.kSlot0)
                         ;
         }

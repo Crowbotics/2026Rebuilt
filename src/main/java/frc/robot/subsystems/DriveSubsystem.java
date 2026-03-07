@@ -72,6 +72,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
+  private double hubDistance;
 
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
@@ -91,7 +92,8 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
-    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    //HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    
     m_gyro.reset();
     
     AutoBuilder.configure(
@@ -126,6 +128,9 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Angle", getHeading());
     SmartDashboard.putNumber("Raw Gyro Angle", m_gyro.getAngle());
     SmartDashboard.putNumber("Angle Radians", getBotRotation2d().getRadians());
+
+    hubDistance = (1.14 - 0.59) / Math.tan(Units.degreesToRadians(LimelightHelpers.getTY(LimelightNames.kLauncherLimelight)));
+    SmartDashboard.putNumber("Hub Distance (inches)", Units.metersToInches(hubDistance));
 
     // Update the odometry in the periodic block
     updateOdometry();
@@ -180,6 +185,8 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
         
+
+    LimelightHelpers.SetRobotOrientation(LimelightNames.kLauncherLimelight, m_odometry.getEstimatedPosition().getRotation().plus(Rotation2d.k180deg).getDegrees(), -m_gyro.getRate(), 0, 0, 0, 0);
     // Update pose with limelights
     // Disabled for week 0
     /*
@@ -401,6 +408,10 @@ public class DriveSubsystem extends SubsystemBase {
       }
       return false;
     });
+  }
+
+  public double getHubDistanceInches() {
+    return Units.metersToInches(hubDistance);
   }
 
   public Command aimAtHubCommand() {

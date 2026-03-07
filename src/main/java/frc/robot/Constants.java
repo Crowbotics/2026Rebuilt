@@ -6,6 +6,8 @@ package frc.robot;
 
 import java.util.Optional;
 
+import org.opencv.core.Mat;
+
 import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
@@ -228,10 +230,10 @@ public final class Constants {
     public static final InterpolatingMatrixTreeMap<Double, N2, N1> ShootingMap = new InterpolatingMatrixTreeMap<>();
 
     static {
-      // TODO
-      Matrix<N2, N1> matrix = new Matrix<N2, N1>(Nat.N2(), Nat.N1());
-
-      ShootingMap.put(5.0, matrix);
+      // speed, angle
+      ShootingMap.put(80.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2.44, 5.71}));
+      ShootingMap.put(163.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{3.24, 18.82}));
+      ShootingMap.put(112.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2.73, 13.47}));
     }
   }
 }

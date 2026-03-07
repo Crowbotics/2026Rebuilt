@@ -6,6 +6,7 @@ import java.util.Optional;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -52,9 +53,13 @@ public class RobotCommands {
 
     public Command alignAndShootRelativeCommand() {
         return Commands.sequence(
-            m_launcher.setHoodAngleCommand(LauncherConstants.kHoodTargetRelativeSetpoint),
             m_robotDrive.aimAtHubRelativeCommand(),
-            m_launcher.runFlywheelCommand(Optional.empty()),
+            Commands.runOnce(() -> {
+                SmartDashboard.putNumber("Flywheel Command Speed", ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(0, 0));
+                SmartDashboard.putNumber("Hood Command Angle", ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(1, 0));
+            }, m_robotDrive),
+            m_launcher.setHoodAngleCommand(ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(1, 0)),
+            m_launcher.runFlywheelCommand(Optional.of(ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(0, 0))),
             m_spindexer.spindexCommand()
         )
         
@@ -62,6 +67,8 @@ public class RobotCommands {
         
         .handleInterrupt(() -> CommandScheduler.getInstance().schedule(
             Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).raceWith(m_robotDrive.idle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            .andThen(m_launcher.setHoodAngleCommand(LauncherConstants.kHoodZero))
+            .andThen(m_launcher.stopFlywheelCommand())
         ));
     }
 

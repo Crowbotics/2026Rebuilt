@@ -37,7 +37,9 @@ public class LauncherSubsystem extends SubsystemBase {
     private final SparkClosedLoopController m_flywheelController = m_flywheel1.getClosedLoopController();
     private final SparkClosedLoopController m_hoodController = m_hood.getClosedLoopController();
 
-    private final boolean zeroedHeading = false;
+    private double testingHoodAngle;
+    private double testingFlywheelSpeed;
+    private boolean zeroedHeading = false;
 
     public LauncherSubsystem() {
         SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
@@ -45,12 +47,14 @@ public class LauncherSubsystem extends SubsystemBase {
         flywheelFollowerConfig.follow(m_flywheel1, true);
         m_flywheel2.configure(flywheelFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        m_flywheel1.configure(Configs.LauncherConfigs.flywheelConfig , ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        m_flywheel1.configure(Configs.LauncherConfigs.flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_hood.configure(Configs.LauncherConfigs.hoodConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
 
-        m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition());
+        m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition() - 0.6);
 
+        SmartDashboard.putNumber("Testing Hood Angle", 0.0);
+        SmartDashboard.putNumber("Testing Flywheel Speed", 1.0);
         /*
         setDefaultCommand(this.run(
             () -> {
@@ -60,12 +64,26 @@ public class LauncherSubsystem extends SubsystemBase {
             }
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         */
+        //setDefaultCommand(setTestingHoodAngleAndFlywheelSpeedCommand());
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
         SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
+        SmartDashboard.putNumber("Flywheel Encoder Speed", m_flywheel1.getEncoder().getVelocity());
+
+        testingHoodAngle = SmartDashboard.getNumber("Testing Hood Angle", m_hoodEncoder.getPosition());
+        testingFlywheelSpeed = SmartDashboard.getNumber("Testing Flywheel Speed", 0.0);
+    }
+
+    public Command setLauncherCommand(double speed, double angle) {
+        return this.runOnce(
+            () -> {
+                m_flywheelController.setSetpoint(speed, ControlType.kVelocity);
+                m_hoodController.setSetpoint(angle, ControlType.kPosition);
+            }
+        );
     }
 
     public Command runFlywheelCommand(Optional<Double> speed) {
@@ -87,9 +105,25 @@ public class LauncherSubsystem extends SubsystemBase {
         ).withName("Stop Flywheel");
     }
 
+    public Command setTestingHoodAngleAndFlywheelSpeedCommand() {
+        if (!zeroedHeading) {
+            m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition() - 0.6);
+            zeroedHeading = true;
+        }
+
+
+        return this.runOnce(
+            () -> {
+                m_hoodController.setSetpoint(testingHoodAngle, ControlType.kPosition);
+                m_flywheelController.setSetpoint(testingFlywheelSpeed, ControlType.kVelocity);
+            }
+        );
+    }
+
     public Command setHoodAngleCommand(double angle) {
         if (!zeroedHeading) {
-            m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition());
+            m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition() - 0.6);
+            zeroedHeading = true;
         }
 
         return this.runOnce(
