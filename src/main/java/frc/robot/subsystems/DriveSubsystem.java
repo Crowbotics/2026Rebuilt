@@ -186,7 +186,7 @@ public class DriveSubsystem extends SubsystemBase {
         });
         
 
-    LimelightHelpers.SetRobotOrientation(LimelightNames.kLauncherLimelight, m_odometry.getEstimatedPosition().getRotation().plus(Rotation2d.k180deg).getDegrees(), -m_gyro.getRate(), 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(LimelightNames.kLauncherLimelight, m_odometry.getEstimatedPosition().getRotation().plus(Rotation2d.k180deg).getDegrees(), 0, 0, 0, 0, 0);
     // Update pose with limelights
     // Disabled for week 0
     /*
@@ -340,7 +340,7 @@ public class DriveSubsystem extends SubsystemBase {
       if (
         // is aiming enough in the right direction
         Math.abs(LimelightHelpers.getTX(LimelightNames.kLauncherLimelight)) <= DriveConstants.kAimAngleTolerance &&
-        // is still enough
+        // is at rest enough
         Math.abs(Units.radiansToDegrees(robotSpeeds.omegaRadiansPerSecond)) <= DriveConstants.kAimRotationalSpeedTolerance
       ) {
         return true;
@@ -401,7 +401,7 @@ public class DriveSubsystem extends SubsystemBase {
       if (
         // is aiming enough in the right direction
         Math.abs(targetAngle.minus(getBotRotation2d()).getDegrees()) <= DriveConstants.kAimAngleTolerance &&
-        // is still enough
+        // is at rest enough
         Math.abs(Units.radiansToDegrees(robotSpeeds.omegaRadiansPerSecond)) <= DriveConstants.kAimRotationalSpeedTolerance
       ) {
         return true;

@@ -27,14 +27,14 @@ import frc.robot.Configs;
 import frc.robot.Constants.LauncherConstants;
 
 public class LauncherSubsystem extends SubsystemBase {
-    private final SparkFlex m_flywheel1 = new SparkFlex(LauncherConstants.kFlywheelCanId1,MotorType.kBrushless);
-    private final SparkFlex m_flywheel2 = new SparkFlex(LauncherConstants.kFlywheelCanId2, MotorType.kBrushless);
+    private final SparkFlex m_flywheel = new SparkFlex(LauncherConstants.kFlywheelCanId,MotorType.kBrushless);
+    private final SparkFlex m_flywheelFollower = new SparkFlex(LauncherConstants.kFlywheelFollowerCanId, MotorType.kBrushless);
     private final SparkMax m_hood = new SparkMax(LauncherConstants.kHoodCanId,MotorType.kBrushless);
 
     private final RelativeEncoder m_hoodEncoder = m_hood.getEncoder();
     private final AbsoluteEncoder m_hoodAbsoluteEncoder = m_hood.getAbsoluteEncoder();
 
-    private final SparkClosedLoopController m_flywheelController = m_flywheel1.getClosedLoopController();
+    private final SparkClosedLoopController m_flywheelController = m_flywheel.getClosedLoopController();
     private final SparkClosedLoopController m_hoodController = m_hood.getClosedLoopController();
 
     private double testingHoodAngle;
@@ -44,16 +44,16 @@ public class LauncherSubsystem extends SubsystemBase {
     public LauncherSubsystem() {
         SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
         flywheelFollowerConfig.idleMode(IdleMode.kCoast);
-        flywheelFollowerConfig.follow(m_flywheel1, true);
-        m_flywheel2.configure(flywheelFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        flywheelFollowerConfig.follow(m_flywheel, true);
+        m_flywheelFollower.configure(flywheelFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        m_flywheel1.configure(Configs.LauncherConfigs.flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_flywheel.configure(Configs.LauncherConfigs.flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_hood.configure(Configs.LauncherConfigs.hoodConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
 
         m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition() - 0.6);
-
-        SmartDashboard.putNumber("Testing Hood Angle", 0.0);
+        
+        SmartDashboard.putNumber("Testing Hood Angle", LauncherConstants.kHoodZero);
         SmartDashboard.putNumber("Testing Flywheel Speed", 1.0);
         /*
         setDefaultCommand(this.run(
@@ -71,7 +71,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
         SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
-        SmartDashboard.putNumber("Flywheel Encoder Speed", m_flywheel1.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Flywheel Encoder Speed", m_flywheel.getEncoder().getVelocity());
 
         testingHoodAngle = SmartDashboard.getNumber("Testing Hood Angle", m_hoodEncoder.getPosition());
         testingFlywheelSpeed = SmartDashboard.getNumber("Testing Flywheel Speed", 0.0);
@@ -93,10 +93,10 @@ public class LauncherSubsystem extends SubsystemBase {
             }
         )
         .withName("Run Flywheel")
-        .andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime));
+        .andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime))
         // Flywheel is run for a little longer on end to ensure that all balls
         // in the system have been cleared
-        //.handleInterrupt(() -> CommandScheduler.getInstance().schedule(stopFlywheelCommand()));
+        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(stopFlywheelCommand()));
     }
 
     public Command stopFlywheelCommand() {
@@ -111,11 +111,14 @@ public class LauncherSubsystem extends SubsystemBase {
             zeroedHeading = true;
         }
 
-
-        return this.runOnce(
+        return this.runEnd(
             () -> {
                 m_hoodController.setSetpoint(testingHoodAngle, ControlType.kPosition);
                 m_flywheelController.setSetpoint(testingFlywheelSpeed, ControlType.kVelocity);
+            },
+            () -> {
+                m_hoodController.setSetpoint(LauncherConstants.kHoodZero, ControlType.kPosition);
+                m_flywheelController.setSetpoint(0, ControlType.kVelocity);
             }
         );
     }

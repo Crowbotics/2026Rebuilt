@@ -39,40 +39,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static enum FieldPosition {
-    // Origin is to the right of the blue alliance wall
-    HUB (
-      new Translation2d(
-        Units.inchesToMeters(182.11),
-        Units.inchesToMeters(158.84)
-      ),
-      new Translation2d(
-        Units.inchesToMeters(469.11),
-        Units.inchesToMeters(158.84)
-      )
-    );
-
-    public Translation2d BlueAlliancePosition;
-    public Translation2d RedAlliancePosition;
-
-    FieldPosition(Translation2d blueAlliancePosition, Translation2d redAlliancePosition) {
-      this.BlueAlliancePosition = blueAlliancePosition;
-      this.RedAlliancePosition = redAlliancePosition;
-    }
-
-    public Translation2d getCurrentAlliance() {
-      Optional<Alliance> alliance = DriverStation.getAlliance();
-      if (alliance.isPresent()) {
-        if (alliance.get() == Alliance.Blue) {
-          return this.BlueAlliancePosition;
-        } else {
-          return this.RedAlliancePosition;
-        }
-      }
-      return this.BlueAlliancePosition; // default to blue alliance if no alliance is found on DS
-    }
-  }
-
   public static final class DriveConstants {
 
     public static final RobotConfig config;
@@ -140,8 +106,8 @@ public final class Constants {
 
     public static final double kRollerSpeed = 0.8; // percent
 
-    public static final double kArmUnextendedSetpoint = 0;
-    public static final double kArmExtendedSetpoint = 252;
+    public static final double kArmUnextendedSetpoint = 80.7; 
+    public static final double kArmExtendedSetpoint = 324.8;
 
     // Arm turning factor
     public static final double kTurningFactor = 360; // convert to degrees
@@ -156,11 +122,23 @@ public final class Constants {
   }
 
   public static final class LauncherConstants {
-    public static final int kFlywheelCanId1 = 13;
-    public static final int kFlywheelCanId2 = 15;
+    public static final int kFlywheelCanId = 13;
+    public static final int kFlywheelFollowerCanId = 15;
     public static final int kHoodCanId = 14;
 
-    public static final double kFlywheelSpeed = 2.7; // meters per second
+    public static final double kShooterWheelRadius = 2;
+    public static final double kFlywheelWindupTime = 0.77; // seconds
+    public static final double kFlywheelRunOn = 0.5; // seconds before flywheel stops
+
+    public static final double kFlywheelSpeed = 2.7; // default speed in meters per second
+
+    // Fallback shoot buttons
+    // For when close to the HUB
+    public static final double kCloseFlywheelSpeed = 2.35;
+    public static final double kCloseHoodAngle = 1.16;
+    // For when near the TOWER
+    public static final double kFarFlywheelSpeed = 2.64;
+    public static final double kFarHoodAngle = 10.88;
 
     public static final double kHoodTargetRelativeSetpoint = 0.5;
 
@@ -171,11 +149,6 @@ public final class Constants {
     public static final double kHoodExtended = 1.37;
 
     public static final double kTurningFactor = 360; // convert to degrees
-
-    public static final double kShooterWheelRadius = 2;
-
-    public static final double kFlywheelWindupTime = 0.77; // seconds
-    public static final double kFlywheelRunOn = 0.5; // seconds before flywheel stops
   }
 
   public static final class ModuleConstants {
@@ -198,6 +171,8 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 2;
     public static final double kDriveDeadband = 0.05;
+    
+    public static final double kTriggerThreshold = 0.2;
   }
 
   public static final class AutoConstants {
@@ -226,10 +201,45 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 6784;
   }
 
+  public static enum FieldPosition {
+    // Origin is to the right of the blue alliance wall
+    HUB (
+      new Translation2d(
+        Units.inchesToMeters(182.11),
+        Units.inchesToMeters(158.84)
+      ),
+      new Translation2d(
+        Units.inchesToMeters(469.11),
+        Units.inchesToMeters(158.84)
+      )
+    );
+
+    public Translation2d BlueAlliancePosition;
+    public Translation2d RedAlliancePosition;
+
+    FieldPosition(Translation2d blueAlliancePosition, Translation2d redAlliancePosition) {
+      this.BlueAlliancePosition = blueAlliancePosition;
+      this.RedAlliancePosition = redAlliancePosition;
+    }
+
+    public Translation2d getCurrentAlliance() {
+      Optional<Alliance> alliance = DriverStation.getAlliance();
+      if (alliance.isPresent()) {
+        if (alliance.get() == Alliance.Blue) {
+          return this.BlueAlliancePosition;
+        } else {
+          return this.RedAlliancePosition;
+        }
+      }
+      return this.BlueAlliancePosition; // default to blue alliance if no alliance is found on DS
+    }
+  }
+
   public static final class ShootingLookupTable {
     public static final InterpolatingMatrixTreeMap<Double, N2, N1> ShootingMap = new InterpolatingMatrixTreeMap<>();
 
     static {
+      // distance (inches)
       // speed, angle
       ShootingMap.put(80.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2.44, 5.71}));
       ShootingMap.put(163.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{3.24, 18.82}));
