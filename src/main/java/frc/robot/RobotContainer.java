@@ -28,6 +28,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -101,16 +103,19 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Collector bindings
-    // 180.5
-    m_driverController.x().onTrue(m_collector.setArmAngleCommand(269.3));
-    m_driverController.y().onTrue(m_collector.setArmAngleCommand(32.0));
+    m_driverController.x().onTrue(m_collector.setArmAngleCommand(CollectorConstants.kArmExtendedSetpoint));
+    m_driverController.y().onTrue(m_collector.setArmAngleCommand(CollectorConstants.kArmUnextendedSetpoint));
     m_driverController.rightBumper().whileTrue(m_collector.runIntakeCommand());
 
     // Spindexer bindings
     m_driverController.leftBumper().whileTrue(m_spindexer.spindexCommand());
 
 		// Launcher bindings
-    m_driverController.rightTrigger(OIConstants.kTriggerThreshold).whileTrue(m_commands.alignAndShootRelativeCommand());
+    m_driverController.rightTrigger(OIConstants.kTriggerThreshold).whileTrue(m_commands.aimAndShootRelativeCommand()).onFalse(
+      Commands.runOnce(() -> {
+        CommandScheduler.getInstance().cancelAll();
+      })
+    );
     m_driverController.povUp().whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kCloseFlywheelSpeed, LauncherConstants.kCloseHoodAngle));
     m_driverController.povDown().whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFarFlywheelSpeed, LauncherConstants.kFarHoodAngle));
 

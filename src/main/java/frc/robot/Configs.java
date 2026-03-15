@@ -70,7 +70,7 @@ public final class Configs {
                         .reverseSoftLimit(359)
                         .reverseSoftLimitEnabled(true);*/
                 armConfig.closedLoop
-                        .pid(0.0012, 0, 0)
+                        .pid(0.0024, 0, 0)
                         .outputRange(-1, 1)
                         .positionWrappingEnabled(false)
                         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)

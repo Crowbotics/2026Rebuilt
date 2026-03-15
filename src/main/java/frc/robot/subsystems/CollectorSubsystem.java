@@ -10,6 +10,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.CollectorConstants;
@@ -41,6 +43,19 @@ public class CollectorSubsystem extends SubsystemBase {
         return this.runOnce(
             () -> {
                 m_armController.setSetpoint(angle, ControlType.kPosition);
+            }
+        );
+    }
+
+    public Command jostleArmCommand() {
+        return new SequentialCommandGroup(
+            setArmAngleCommand(CollectorConstants.kArmUnextendedSetpoint + 15),
+            Commands.waitSeconds(0.6),
+            setArmAngleCommand(CollectorConstants.kArmExtendedSetpoint),
+            Commands.waitSeconds(0.6)
+        ).repeatedly().finallyDo(
+            () -> {
+                m_armController.setSetpoint(CollectorConstants.kArmExtendedSetpoint, ControlType.kPosition);
             }
         );
     }

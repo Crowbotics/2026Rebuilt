@@ -86,10 +86,23 @@ public class LauncherSubsystem extends SubsystemBase {
         );
     }
 
-    public Command runFlywheelCommand(Optional<Double> speed) {
+    public Command runFlywheelCommand() {
         return this.runOnce(
             () -> {
-                m_flywheelController.setSetpoint(speed.isPresent() ? speed.get() : LauncherConstants.kFlywheelSpeed, ControlType.kVelocity);
+                m_flywheelController.setSetpoint(LauncherConstants.kFlywheelSpeed, ControlType.kVelocity);
+            }
+        )
+        .withName("Run Flywheel")
+        .andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime))
+        // Flywheel is run for a little longer on end to ensure that all balls
+        // in the system have been cleared
+        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(stopFlywheelCommand()));
+    }
+
+    public Command runFlywheelCommand(double speed) {
+        return this.runOnce(
+            () -> {
+                m_flywheelController.setSetpoint(speed, ControlType.kVelocity);
             }
         )
         .withName("Run Flywheel")
@@ -124,13 +137,15 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public Command setHoodAngleCommand(double angle) {
+        /*
         if (!zeroedHeading) {
             m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition() - 0.6);
             zeroedHeading = true;
-        }
+        }*/
 
         return this.runOnce(
             () -> {
+                SmartDashboard.putNumber("Hood Setpoint", angle);
                 m_hoodController.setSetpoint(angle, ControlType.kPosition);
             }
         );

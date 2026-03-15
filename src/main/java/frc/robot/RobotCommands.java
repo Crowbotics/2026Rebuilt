@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.CollectorConstants;
 import frc.robot.Constants.FieldPosition;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.ShootingLookupTable;
@@ -36,50 +37,53 @@ public class RobotCommands {
         this.m_collector = m_collector;
     }
 
+    public Command spindexAndLiftArmCommand() {
+        return m_spindexer.spindexCommand().alongWith(
+            Commands.waitSeconds(CollectorConstants.kTimeUntilArmLiftsWhileShooting)
+            .andThen(m_collector.jostleArmCommand())
+        );
+    }
+
     public Command spindexAndShootCommand(double flywheelSpeed, double hoodAngle) {
         return Commands.sequence(
             m_launcher.setHoodAngleAndWaitCommand(hoodAngle),
-            m_launcher.runFlywheelCommand(Optional.of(flywheelSpeed)),
-            m_spindexer.spindexCommand()
+            m_launcher.runFlywheelCommand(flywheelSpeed),
+            spindexAndLiftArmCommand()
         )
         
         .handleInterrupt(() -> CommandScheduler.getInstance().schedule(
             Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).raceWith(m_robotDrive.idle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
             .andThen(m_launcher.setHoodAngleCommand(LauncherConstants.kHoodZero))
             .andThen(m_launcher.stopFlywheelCommand())
-        ));
+        ))
+        .withName("Spindex and Shoot");
     }
 
-    public Command alignAndShootRelativeCommand() {
-        return Commands.sequence(
-            m_robotDrive.aimAtHubRelativeCommand(),
-            Commands.runOnce(() -> {
-                SmartDashboard.putNumber("Flywheel Command Speed", ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(0, 0));
-                SmartDashboard.putNumber("Hood Command Angle", ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(1, 0));
-            }, m_robotDrive),
-            m_launcher.setHoodAngleCommand(ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(1, 0)),
-            m_launcher.runFlywheelCommand(Optional.of(ShootingLookupTable.ShootingMap.get(m_robotDrive.getHubDistanceInches()).get(0, 0))),
-            m_spindexer.spindexCommand()
-        )
-        
-        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        
-        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(
-            Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).raceWith(m_robotDrive.idle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-            .andThen(m_launcher.setHoodAngleCommand(LauncherConstants.kHoodZero))
-            .andThen(m_launcher.stopFlywheelCommand())
-        ));
+    public Command aimAndShootRelativeCommand() {
+        return m_robotDrive.aimAtHubRelativeCommand().andThen(Commands.runOnce(() -> {
+            double distance = m_robotDrive.getHubDistanceInches();
+            Matrix<N2, N1> speedAndAngle = ShootingLookupTable.ShootingMap.get(distance);
+            double flywheelSpeed = speedAndAngle.get(0, 0);
+            double hoodAngle = speedAndAngle.get(1, 0);
+
+            SmartDashboard.putNumber("Hood Command Angle", hoodAngle);
+            SmartDashboard.putNumber("Flywheel Command Speed", flywheelSpeed);
+
+            CommandScheduler.getInstance().schedule(spindexAndShootCommand(flywheelSpeed, hoodAngle));
+        }, m_robotDrive, m_launcher, m_spindexer, m_collector));
     }
 
     public Command alignAndShootCommand() {
         double distanceFromHub = FieldPosition.HUB.getCurrentAlliance().getDistance(m_robotDrive.getPose().getTranslation());
         Matrix<N2, N1> speedAndAngle = ShootingLookupTable.ShootingMap.get(distanceFromHub);
+        double flywheelSpeed = speedAndAngle.get(0, 0);
+        double hoodAngle = speedAndAngle.get(1, 0);
 
         return Commands.sequence(
             m_launcher.setHoodAngleCommand(speedAndAngle.get(1, 0)),
             m_robotDrive.aimAtHubCommand().alongWith(m_launcher.waitForHoodAngleChangeCommand()),
-            m_launcher.runFlywheelCommand(Optional.of(speedAndAngle.get(0, 0))),
-            m_spindexer.spindexCommand()
+            m_launcher.runFlywheelCommand(speedAndAngle.get(0, 0)),
+            spindexAndLiftArmCommand()
         )
 
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)

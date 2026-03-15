@@ -129,7 +129,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Raw Gyro Angle", m_gyro.getAngle());
     SmartDashboard.putNumber("Angle Radians", getBotRotation2d().getRadians());
 
-    hubDistance = (1.14 - 0.59) / Math.tan(Units.degreesToRadians(LimelightHelpers.getTY(LimelightNames.kLauncherLimelight)));
+    hubDistance = (DriveConstants.kHubHeight - DriveConstants.kLimelightHeight) / Math.tan(Units.degreesToRadians(LimelightHelpers.getTY(LimelightNames.kLauncherLimelight) + DriveConstants.kLimelightPitch));
     SmartDashboard.putNumber("Hub Distance (inches)", Units.metersToInches(hubDistance));
 
     // Update the odometry in the periodic block
@@ -411,6 +411,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getHubDistanceInches() {
+    SmartDashboard.putNumber("Hub Distance Test", Units.metersToInches(hubDistance));
     return Units.metersToInches(hubDistance);
   }
 
