@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.CollectorConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
@@ -109,11 +110,9 @@ public class RobotContainer {
     m_driverController.leftBumper().whileTrue(m_spindexer.spindexCommand());
 
 		// Launcher bindings
-		//m_driverController.leftBumper().whileTrue(m_launcher.runFlywheelCommand(Optional.empty()));
-
-    m_driverController.rightTrigger(.2).debounce(0.2).whileTrue(m_commands.alignAndShootRelativeCommand());
-    m_driverController.povUp().whileTrue(m_commands.spindexAndShootCommand(2.35, 1.16));
-    m_driverController.povDown().whileTrue(m_commands.spindexAndShootCommand(2.64, 10.88));
+    m_driverController.rightTrigger(OIConstants.kTriggerThreshold).whileTrue(m_commands.alignAndShootRelativeCommand());
+    m_driverController.povUp().whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kCloseFlywheelSpeed, LauncherConstants.kCloseHoodAngle));
+    m_driverController.povDown().whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFarFlywheelSpeed, LauncherConstants.kFarHoodAngle));
 
     // Drive bindings
     m_driverController.b().whileTrue(m_robotDrive.aimAtHubRelativeCommand());
@@ -123,6 +122,14 @@ public class RobotContainer {
         () -> {
             m_robotDrive.zeroHeading();
         }, m_robotDrive));
+  }
+
+  public void startTestMode() {
+    m_launcher.setDefaultCommand(m_launcher.setTestingHoodAngleAndFlywheelSpeedCommand());
+  }
+
+  public void exitTestMode() {
+    m_launcher.setDefaultCommand(m_launcher.idle());
   }
 
   /**
