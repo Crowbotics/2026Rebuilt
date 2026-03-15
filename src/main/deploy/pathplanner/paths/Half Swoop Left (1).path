@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.57,
+        "y": 5.95
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.57,
+        "y": 5.95
+      },
+      "isLocked": false,
+      "linkedName": "Left Front of Bump Start "
+    },
+    {
+      "anchor": {
+        "x": 6.075,
+        "y": 5.95
+      },
+      "prevControl": {
+        "x": 5.075,
+        "y": 5.95
+      },
+      "nextControl": {
+        "x": 7.075,
+        "y": 5.95
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.1,
+        "y": 6.8
+      },
+      "prevControl": {
+        "x": 6.5000298524143085,
+        "y": 6.8097737830250855
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -75.0
+  },
+  "reversed": false,
+  "folder": "Competition Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": false
+}

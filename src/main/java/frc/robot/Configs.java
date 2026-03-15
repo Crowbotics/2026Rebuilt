@@ -78,12 +78,10 @@ public final class Configs {
                 armConfig.absoluteEncoder
                         .velocityConversionFactor(CollectorConstants.kTurningFactor)
                         .positionConversionFactor(CollectorConstants.kTurningFactor)
-                        .zeroOffset(100.0/360.0)
+                        .setSparkMaxDataPortConfig()
+                        .zeroOffset(100/360.0)
                         .inverted(true);
-                        // Uncomment once encoder is confirmed to be working
-                        //.setSparkMaxDataPortConfig()
-                        //.countsPerRevolution(8192)
-                        ; // Through Bore Encoder
+                        // Through Bore Encoder
                         
         }
     }

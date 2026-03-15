@@ -57,4 +57,20 @@ public class CollectorSubsystem extends SubsystemBase {
             }
         );
     }
+
+    public Command startIntakeCommand() {
+        return this.runOnce(
+            () -> {
+                m_roller.set(CollectorConstants.kRollerSpeed);
+            }
+        );
+    }
+
+    public Command stopIntakeCommand() {
+        return this.runOnce(
+            () -> {
+                m_roller.set(0);
+            }
+        );
+    }
 }

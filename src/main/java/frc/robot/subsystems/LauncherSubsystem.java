@@ -51,7 +51,7 @@ public class LauncherSubsystem extends SubsystemBase {
 
         m_hood.configure(Configs.LauncherConfigs.hoodConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
 
-        m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition() - 0.6);
+        m_hoodEncoder.setPosition(m_hoodAbsoluteEncoder.getPosition() - 0.7);
 
         SmartDashboard.putNumber("Testing Hood Angle", 0.0);
         SmartDashboard.putNumber("Testing Flywheel Speed", 1.0);

@@ -7,25 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Over Bump"
+            "pathName": "Depot (1)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Travel to Fuel"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Collect fuel"
+            "pathName": "Depot (2)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Test Autos",
+  "folder": "Competition Autos",
   "choreoAuto": false
 }

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -62,7 +63,13 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-		// Configure auto chooser
+		// Configure PathPlanner named commands
+    NamedCommands.registerCommand("Start Intake", m_collector.startIntakeCommand());
+    NamedCommands.registerCommand("Stop Intake", m_collector.stopIntakeCommand());
+    NamedCommands.registerCommand("Extend Arm", m_collector.setArmAngleCommand(0));
+    NamedCommands.registerCommand("Detract Arm", m_collector.setArmAngleCommand(0));
+    
+    // Configure auto chooser
 		autoChooser = AutoBuilder.buildAutoChooser();
 		SmartDashboard.putData(autoChooser);
 
@@ -94,8 +101,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Collector bindings
     // 180.5
-    m_driverController.x().onTrue(m_collector.setArmAngleCommand(324.8));
-    m_driverController.y().onTrue(m_collector.setArmAngleCommand(80.7));
+    m_driverController.x().onTrue(m_collector.setArmAngleCommand(269.3));
+    m_driverController.y().onTrue(m_collector.setArmAngleCommand(32.0));
     m_driverController.rightBumper().whileTrue(m_collector.runIntakeCommand());
 
     // Spindexer bindings
