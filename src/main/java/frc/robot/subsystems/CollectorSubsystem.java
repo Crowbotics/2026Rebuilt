@@ -56,19 +56,29 @@ public class CollectorSubsystem extends SubsystemBase {
         ).repeatedly().finallyDo(
             () -> {
                 m_armController.setSetpoint(CollectorConstants.kArmExtendedSetpoint, ControlType.kPosition);
+                m_roller.set(0);
             }
-        );
+        ).beforeStarting(startIntakeCommand(CollectorConstants.kRollerJostleSpeed));
     }
 
     public Command runIntakeCommand() {
         return this.startEnd(
             () -> {
-                //m_armController.setSetpoint(CollectorConstants.kArmExtendedSetpoint, ControlType.kPosition);
                 m_roller.set(CollectorConstants.kRollerSpeed);
             },
             () -> {
                 m_roller.set(0);
-                //m_armController.setSetpoint(CollectorConstants.kArmUnextendedSetpoint, ControlType.kPosition);
+            }
+        );
+    }
+
+    public Command runIntakeCommand(double speed) {
+        return this.startEnd(
+            () -> {
+                m_roller.set(speed);
+            },
+            () -> {
+                m_roller.set(0);
             }
         );
     }
@@ -77,6 +87,14 @@ public class CollectorSubsystem extends SubsystemBase {
         return this.runOnce(
             () -> {
                 m_roller.set(CollectorConstants.kRollerSpeed);
+            }
+        );
+    }
+
+    public Command startIntakeCommand(double speed) {
+        return this.runOnce(
+            () -> {
+                m_roller.set(speed);
             }
         );
     }

@@ -69,9 +69,10 @@ public class RobotContainer {
 		// Configure PathPlanner named commands
     NamedCommands.registerCommand("Start Intake", m_collector.startIntakeCommand());
     NamedCommands.registerCommand("Stop Intake", m_collector.stopIntakeCommand());
-    NamedCommands.registerCommand("Extend Arm", m_collector.setArmAngleCommand(0));
-    NamedCommands.registerCommand("Detract Arm", m_collector.setArmAngleCommand(0));
-    
+    NamedCommands.registerCommand("Extend Arm", m_collector.setArmAngleCommand(CollectorConstants.kArmExtendedSetpoint));
+    NamedCommands.registerCommand("Detract Arm", m_collector.setArmAngleCommand(CollectorConstants.kArmUnextendedSetpoint));
+    NamedCommands.registerCommand("Aim then Shoot", m_commands.aimAndShootRelativeCommand());
+
     // Configure auto chooser
 		autoChooser = AutoBuilder.buildAutoChooser();
 		SmartDashboard.putData(autoChooser);

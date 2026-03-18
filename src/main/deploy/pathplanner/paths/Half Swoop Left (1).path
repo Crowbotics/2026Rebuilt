@@ -32,11 +32,11 @@
     },
     {
       "anchor": {
-        "x": 8.1,
+        "x": 8.4,
         "y": 6.8
       },
       "prevControl": {
-        "x": 6.5000298524143085,
+        "x": 6.800029852414309,
         "y": 6.8097737830250855
       },
       "nextControl": null,
@@ -52,7 +52,30 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Extend Arm",
+      "waypointRelativePos": 0.8,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Extend Arm"
+        }
+      }
+    },
+    {
+      "name": "Start Intake",
+      "waypointRelativePos": 1.2,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Intake"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.0,
     "maxAcceleration": 2.0,

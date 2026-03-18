@@ -109,6 +109,7 @@ public final class Constants {
     public static final int kRollerCanId = 10;
 
     public static final double kRollerSpeed = 0.8; // percent
+    public static final double kRollerJostleSpeed = 0.3; // percent
 
     public static final double kArmUnextendedSetpoint = 32.0; 
     public static final double kArmExtendedSetpoint = 262.0;
