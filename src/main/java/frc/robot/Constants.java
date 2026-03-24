@@ -58,10 +58,6 @@ public final class Constants {
     public static final double kAimAngleTolerance = 10; // degrees
     public static final double kAimRotationalSpeedTolerance = 2; // degrees per second
 
-    public static final double kHubHeight = 1.14; // meters
-    public static final double kLimelightHeight = 0.316; // meters
-    public static final double kLimelightPitch = 20.0; // degrees from horizontal
-
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 3/*4.79 */;
@@ -112,7 +108,7 @@ public final class Constants {
     public static final double kRollerJostleSpeed = 0.3; // percent
 
     public static final double kArmUnextendedSetpoint = 32.0; 
-    public static final double kArmExtendedSetpoint = 262.0;
+    public static final double kArmExtendedSetpoint = 262.0 + 5;
 
     // Arm turning factor
     public static final double kTurningFactor = 360; // convert to degrees
@@ -138,6 +134,10 @@ public final class Constants {
     public static final double kFlywheelRunOn = 0.5; // seconds before flywheel stops
 
     public static final double kFlywheelSpeed = 2.7; // default speed in meters per second
+
+    public static final double kHubHeight = 1.14; // meters
+    public static final double kLimelightHeight = 0.316; // meters
+    public static final double kLimelightPitch = 20.0; // degrees from horizontal
 
     // Fallback shoot buttons
     // For when close to the HUB
@@ -176,9 +176,9 @@ public final class Constants {
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 2;
+    public static final int kDriverControllerPort = 0;
+
     public static final double kDriveDeadband = 0.05;
-    
     public static final double kTriggerThreshold = 0.2;
   }
 

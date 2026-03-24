@@ -72,8 +72,6 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
-  private double hubDistance;
-
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
@@ -128,9 +126,6 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Angle", getHeading());
     SmartDashboard.putNumber("Raw Gyro Angle", m_gyro.getAngle());
     SmartDashboard.putNumber("Angle Radians", getBotRotation2d().getRadians());
-
-    hubDistance = (DriveConstants.kHubHeight - DriveConstants.kLimelightHeight) / Math.tan(Units.degreesToRadians(LimelightHelpers.getTY(LimelightNames.kLauncherLimelight) + DriveConstants.kLimelightPitch));
-    SmartDashboard.putNumber("Hub Distance (inches)", Units.metersToInches(hubDistance));
 
     // Update the odometry in the periodic block
     updateOdometry();
@@ -318,8 +313,6 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  // For week 0, we will focus on simply aiming towards the hub
-  // using a limelight
   public double getAimSpeedRelative() {
     double error = LimelightHelpers.getTX(LimelightNames.kLauncherLimelight);
 
@@ -408,11 +401,6 @@ public class DriveSubsystem extends SubsystemBase {
       }
       return false;
     });
-  }
-
-  public double getHubDistanceInches() {
-    SmartDashboard.putNumber("Hub Distance Test", Units.metersToInches(hubDistance));
-    return Units.metersToInches(hubDistance);
   }
 
   public Command aimAtHubCommand() {

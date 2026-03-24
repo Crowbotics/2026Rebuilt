@@ -59,18 +59,22 @@ public class RobotCommands {
         .withName("Spindex and Shoot");
     }
 
+    public Command spindexAndAutoShootCommand() {
+        return Commands.sequence(
+            m_launcher.autoShootCommand(),
+            spindexAndLiftArmCommand()
+        )
+
+        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(
+            Commands.waitSeconds(LauncherConstants.kFlywheelRunOn).raceWith(m_robotDrive.idle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            .andThen(m_launcher.setHoodAngleCommand(LauncherConstants.kHoodZero))
+            .andThen(m_launcher.stopFlywheelCommand())
+        ))
+        .withName("Spindex and Auto Shoot");
+    }
+
     public Command aimAndShootRelativeCommand() {
-        return m_robotDrive.aimAtHubRelativeCommand().andThen(Commands.runOnce(() -> {
-            double distance = m_robotDrive.getHubDistanceInches();
-            Matrix<N2, N1> speedAndAngle = ShootingLookupTable.ShootingMap.get(distance);
-            double flywheelSpeed = speedAndAngle.get(0, 0);
-            double hoodAngle = speedAndAngle.get(1, 0);
-
-            SmartDashboard.putNumber("Hood Command Angle", hoodAngle);
-            SmartDashboard.putNumber("Flywheel Command Speed", flywheelSpeed);
-
-            CommandScheduler.getInstance().schedule(spindexAndShootCommand(flywheelSpeed, hoodAngle));
-        }, m_robotDrive, m_launcher, m_spindexer, m_collector));
+        return m_robotDrive.aimAtHubRelativeCommand().andThen(spindexAndAutoShootCommand());
     }
 
     public Command alignAndShootCommand() {

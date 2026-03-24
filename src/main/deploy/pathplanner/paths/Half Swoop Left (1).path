@@ -32,12 +32,60 @@
     },
     {
       "anchor": {
-        "x": 8.4,
+        "x": 8.2,
         "y": 6.8
       },
       "prevControl": {
-        "x": 6.800029852414309,
-        "y": 6.8097737830250855
+        "x": 6.6,
+        "y": 6.8
+      },
+      "nextControl": {
+        "x": 8.45,
+        "y": 6.8
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.4,
+        "y": 4.89
+      },
+      "prevControl": {
+        "x": 8.4,
+        "y": 5.89
+      },
+      "nextControl": {
+        "x": 8.4,
+        "y": 4.64
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.7,
+        "y": 5.54
+      },
+      "prevControl": {
+        "x": 6.94463623990443,
+        "y": 5.488491649944669
+      },
+      "nextControl": {
+        "x": 6.455363760095571,
+        "y": 5.591508350055331
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8,
+        "y": 5.54
+      },
+      "prevControl": {
+        "x": 3.8,
+        "y": 5.54
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,9 +96,35 @@
     {
       "waypointRelativePos": 1.0,
       "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": -75.0
+    },
+    {
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": -75.0
+    },
+    {
+      "waypointRelativePos": 4.0,
+      "rotationDegrees": -119.99999999999999
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 2.0,
+      "maxWaypointRelativePos": 3.2,
+      "constraints": {
+        "maxVelocity": 0.6,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
@@ -74,6 +148,17 @@
           "name": "Start Intake"
         }
       }
+    },
+    {
+      "name": "Stop Intake",
+      "waypointRelativePos": 4.25,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Intake"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -86,7 +171,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -75.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "Competition Paths",

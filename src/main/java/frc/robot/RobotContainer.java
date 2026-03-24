@@ -112,11 +112,7 @@ public class RobotContainer {
     m_driverController.leftBumper().whileTrue(m_spindexer.spindexCommand());
 
 		// Launcher bindings
-    m_driverController.rightTrigger(OIConstants.kTriggerThreshold).whileTrue(m_commands.aimAndShootRelativeCommand()).onFalse(
-      Commands.runOnce(() -> {
-        CommandScheduler.getInstance().cancelAll();
-      })
-    );
+    m_driverController.rightTrigger(OIConstants.kTriggerThreshold).whileTrue(m_commands.aimAndShootRelativeCommand());
     m_driverController.povUp().whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kCloseFlywheelSpeed, LauncherConstants.kCloseHoodAngle));
     m_driverController.povDown().whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFarFlywheelSpeed, LauncherConstants.kFarHoodAngle));
 

@@ -15,6 +15,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +26,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Configs;
 import frc.robot.Constants.LauncherConstants;
+import frc.robot.Constants.LimelightNames;
+import frc.robot.Constants.ShootingLookupTable;
+import frc.robot.LimelightHelpers;
 
 public class LauncherSubsystem extends SubsystemBase {
     private final SparkFlex m_flywheel = new SparkFlex(LauncherConstants.kFlywheelCanId,MotorType.kBrushless);
@@ -40,6 +44,7 @@ public class LauncherSubsystem extends SubsystemBase {
     private double testingHoodAngle;
     private double testingFlywheelSpeed;
     private boolean zeroedHeading = false;
+    private static double hubDistance;
 
     public LauncherSubsystem() {
         SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
@@ -69,12 +74,37 @@ public class LauncherSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
-        SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
-        SmartDashboard.putNumber("Flywheel Encoder Speed", m_flywheel.getEncoder().getVelocity());
+        calculateHubDistance();
 
         testingHoodAngle = SmartDashboard.getNumber("Testing Hood Angle", m_hoodEncoder.getPosition());
         testingFlywheelSpeed = SmartDashboard.getNumber("Testing Flywheel Speed", 0.0);
+
+        SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
+        SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
+        SmartDashboard.putNumber("Flywheel Encoder Speed", m_flywheel.getEncoder().getVelocity());
+    }
+
+    private double calculateHubDistance() {
+        hubDistance = (LauncherConstants.kHubHeight - LauncherConstants.kLimelightHeight) / Math.tan(Units.degreesToRadians(LimelightHelpers.getTY(LimelightNames.kLauncherLimelight) + LauncherConstants.kLimelightPitch)) + 0.33;
+        return hubDistance;
+    }
+
+    public static double getHubDistanceInMeters() {
+        return hubDistance;
+    }
+
+    public static double getHubDistanceInInches() {
+        return Units.metersToInches(hubDistance);
+    }
+
+    private double autoShootDistance;
+    public Command autoShootCommand() {
+        return this.runOnce(() -> {
+            autoShootDistance = getHubDistanceInInches();
+        }).andThen(Commands.sequence(
+            autoSetHoodAngleCommand(),
+            autoRunFlywheelCommand()
+        ));
     }
 
     public Command setLauncherCommand(double speed, double angle) {
@@ -84,6 +114,25 @@ public class LauncherSubsystem extends SubsystemBase {
                 m_hoodController.setSetpoint(angle, ControlType.kPosition);
             }
         );
+    }
+
+    public Command autoRunFlywheelCommand() {
+        return this.runOnce(() -> {
+            double flywheelSpeed = ShootingLookupTable.ShootingMap.get(autoShootDistance).get(0, 0);
+            m_flywheelController.setSetpoint(flywheelSpeed, ControlType.kVelocity);
+        }).andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime));
+    }
+
+    public Command autoSetHoodAngleCommand() {
+        return this.runOnce(() -> {
+            double hoodAngle = ShootingLookupTable.ShootingMap.get(autoShootDistance).get(1, 0);
+            m_hoodController.setSetpoint(hoodAngle, ControlType.kPosition);
+        }).andThen(this.idle().until(() -> {
+            if (Math.abs(ShootingLookupTable.ShootingMap.get(autoShootDistance).get(1, 0) - m_hoodEncoder.getPosition()) <= LauncherConstants.kHoodAngleTolerance) {
+                return true;
+            }
+            return false;
+        }));
     }
 
     public Command runFlywheelCommand() {
@@ -96,7 +145,7 @@ public class LauncherSubsystem extends SubsystemBase {
         .andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime))
         // Flywheel is run for a little longer on end to ensure that all balls
         // in the system have been cleared
-        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(stopFlywheelCommand()));
+        .handleInterrupt(this::stopFlywheel);
     }
 
     public Command runFlywheelCommand(double speed) {
@@ -109,7 +158,11 @@ public class LauncherSubsystem extends SubsystemBase {
         .andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime))
         // Flywheel is run for a little longer on end to ensure that all balls
         // in the system have been cleared
-        .handleInterrupt(() -> CommandScheduler.getInstance().schedule(stopFlywheelCommand()));
+        .handleInterrupt(this::stopFlywheel);
+    }
+
+    public void stopFlywheel() {
+        m_flywheelController.setSetpoint(0, ControlType.kVelocity);
     }
 
     public Command stopFlywheelCommand() {
@@ -157,7 +210,7 @@ public class LauncherSubsystem extends SubsystemBase {
                 m_hoodController.setSetpoint(angle, ControlType.kPosition);
             }
         ).andThen(this.idle().until(() -> {
-            if (Math.abs(m_hoodEncoder.getPosition()) <= LauncherConstants.kHoodAngleTolerance) {
+            if (Math.abs(angle -m_hoodEncoder.getPosition()) <= LauncherConstants.kHoodAngleTolerance) {
                 return true;
             }
             return false;
