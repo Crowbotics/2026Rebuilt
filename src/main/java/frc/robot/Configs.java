@@ -25,7 +25,7 @@ public final class Configs {
             drivingConfig
                     .idleMode(IdleMode.kBrake)
                     .inverted(false)
-                    .smartCurrentLimit(50);
+                    .smartCurrentLimit(60);
             drivingConfig.encoder
                     .positionConversionFactor(drivingFactor) // meters
                     .velocityConversionFactor(drivingFactor / 60.0); // meters per second
@@ -60,9 +60,13 @@ public final class Configs {
     }
 
     public static final class CollectorConfigs {
+        public static final SparkMaxConfig rollerConfig = new SparkMaxConfig();
         public static final SparkMaxConfig armConfig = new SparkMaxConfig();
 
         static {
+                rollerConfig
+                        .idleMode(IdleMode.kCoast);
+
                 armConfig
                         .idleMode(IdleMode.kBrake)
                         .inverted(true);
@@ -86,6 +90,20 @@ public final class Configs {
         }
     }
 
+    public static final class SpindexerConfigs {
+        public static final SparkMaxConfig spinnerConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig kickerConfig = new SparkMaxConfig();
+
+        static {
+                spinnerConfig
+                        .inverted(false)
+                        .idleMode(IdleMode.kCoast);
+
+                kickerConfig
+                        .idleMode(IdleMode.kCoast);
+        }
+    }
+
     public static final class LauncherConfigs {
         public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
         public static final SparkFlexConfig flywheelConfig2 = new SparkFlexConfig();
@@ -98,16 +116,16 @@ public final class Configs {
                         .inverted(true)
                         .idleMode(IdleMode.kCoast);
                 flywheelConfig.encoder
-                        .velocityConversionFactor(shooterVelocityFactor); // convert rotations per minute to meters per second
+                        .velocityConversionFactor(1); // convert rotations per minute to meters per second
                 flywheelConfig.closedLoop
-                        .pid(0.001, 0, 0)
+                        .pid(0.0005, 0, 0)
                         .outputRange(-1, 1)
                         .feedForward
-                                .kV(0.38); // volts per meters per second
-                                //.kA(0.26); // volts per meters per second squared. Not used for velocity control mode
+                                .kV(0.000152); // volts per meter per second
+                                //.kA(0.26); // volts per meter per second squared. Not used for velocity control mode
 
                 hoodConfig
-                        .idleMode(IdleMode.kCoast);
+                        .idleMode(IdleMode.kBrake);
                 hoodConfig.encoder
                         .positionConversionFactor((1.0/12.0) * 23.0)
                         .velocityConversionFactor(1)

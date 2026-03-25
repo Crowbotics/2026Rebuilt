@@ -109,7 +109,7 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(m_collector.runIntakeCommand());
 
     // Spindexer bindings
-    m_driverController.leftBumper().whileTrue(m_spindexer.spindexCommand());
+    m_driverController.leftBumper().whileTrue(m_collector.reverseIntakeCommand());
 
 		// Launcher bindings
     m_driverController.rightTrigger(OIConstants.kTriggerThreshold).whileTrue(m_commands.aimAndShootRelativeCommand());
@@ -117,7 +117,7 @@ public class RobotContainer {
     m_driverController.povDown().whileTrue(m_commands.spindexAndShootCommand(LauncherConstants.kFarFlywheelSpeed, LauncherConstants.kFarHoodAngle));
 
     // Drive bindings
-    m_driverController.b().whileTrue(m_robotDrive.aimAtHubRelativeCommand());
+    m_driverController.b().whileTrue(m_commands.spindexAndLiftArmCommand());
 
 		m_driverController.a()
 				.onTrue(new InstantCommand(

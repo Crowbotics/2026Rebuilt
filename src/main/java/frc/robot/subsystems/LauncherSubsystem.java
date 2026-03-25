@@ -79,13 +79,14 @@ public class LauncherSubsystem extends SubsystemBase {
         testingHoodAngle = SmartDashboard.getNumber("Testing Hood Angle", m_hoodEncoder.getPosition());
         testingFlywheelSpeed = SmartDashboard.getNumber("Testing Flywheel Speed", 0.0);
 
+        SmartDashboard.putNumber("Hub Distance (Inches)", getHubDistanceInInches());
         SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
         SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
         SmartDashboard.putNumber("Flywheel Encoder Speed", m_flywheel.getEncoder().getVelocity());
     }
 
     private double calculateHubDistance() {
-        hubDistance = (LauncherConstants.kHubHeight - LauncherConstants.kLimelightHeight) / Math.tan(Units.degreesToRadians(LimelightHelpers.getTY(LimelightNames.kLauncherLimelight) + LauncherConstants.kLimelightPitch)) + 0.33;
+        hubDistance = (LauncherConstants.kHubHeight - LauncherConstants.kLimelightHeight) / Math.tan(Units.degreesToRadians(LimelightHelpers.getTY(LimelightNames.kLauncherLimelight) + LauncherConstants.kLimelightPitch));
         return hubDistance;
     }
 
@@ -110,7 +111,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public Command setLauncherCommand(double speed, double angle) {
         return this.runOnce(
             () -> {
-                m_flywheelController.setSetpoint(speed, ControlType.kVelocity);
+                setFlywheelSpeed(speed);
                 m_hoodController.setSetpoint(angle, ControlType.kPosition);
             }
         );
@@ -119,8 +120,8 @@ public class LauncherSubsystem extends SubsystemBase {
     public Command autoRunFlywheelCommand() {
         return this.runOnce(() -> {
             double flywheelSpeed = ShootingLookupTable.ShootingMap.get(autoShootDistance).get(0, 0);
-            m_flywheelController.setSetpoint(flywheelSpeed, ControlType.kVelocity);
-        }).andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime));
+            setFlywheelSpeed(flywheelSpeed);
+        }).andThen(Commands.waitSeconds(LauncherConstants.kFlywheelWindupTime)).handleInterrupt(this::stopFlywheel);
     }
 
     public Command autoSetHoodAngleCommand() {
@@ -138,7 +139,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public Command runFlywheelCommand() {
         return this.runOnce(
             () -> {
-                m_flywheelController.setSetpoint(LauncherConstants.kFlywheelSpeed, ControlType.kVelocity);
+                setFlywheelSpeed(LauncherConstants.kFlywheelSpeed);
             }
         )
         .withName("Run Flywheel")
@@ -151,7 +152,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public Command runFlywheelCommand(double speed) {
         return this.runOnce(
             () -> {
-                m_flywheelController.setSetpoint(speed, ControlType.kVelocity);
+                setFlywheelSpeed(speed);
             }
         )
         .withName("Run Flywheel")
@@ -161,8 +162,13 @@ public class LauncherSubsystem extends SubsystemBase {
         .handleInterrupt(this::stopFlywheel);
     }
 
+    public void setFlywheelSpeed(double speed) {
+        SmartDashboard.putNumber("Commanded Flywheel Speed", speed);
+        m_flywheelController.setSetpoint(speed, ControlType.kVelocity);
+    }
+
     public void stopFlywheel() {
-        m_flywheelController.setSetpoint(0, ControlType.kVelocity);
+        setFlywheelSpeed(0);
     }
 
     public Command stopFlywheelCommand() {

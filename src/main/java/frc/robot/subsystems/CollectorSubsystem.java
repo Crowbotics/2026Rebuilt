@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
+import frc.robot.Configs.CollectorConfigs;
 import frc.robot.Constants.CollectorConstants;
 
 public class CollectorSubsystem extends SubsystemBase {
@@ -25,7 +26,8 @@ public class CollectorSubsystem extends SubsystemBase {
     private final SparkClosedLoopController m_armController;
 
     public CollectorSubsystem() {
-        m_arm.configure(Configs.CollectorConfigs.armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_roller.configure(CollectorConfigs.rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_arm.configure(CollectorConfigs.armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_armController = m_arm.getClosedLoopController();
 
@@ -65,6 +67,17 @@ public class CollectorSubsystem extends SubsystemBase {
         return this.startEnd(
             () -> {
                 m_roller.set(CollectorConstants.kRollerSpeed);
+            },
+            () -> {
+                m_roller.set(0);
+            }
+        );
+    }
+
+    public Command reverseIntakeCommand() {
+        return this.startEnd(
+            () -> {
+                m_roller.set(-CollectorConstants.kRollerSpeed);
             },
             () -> {
                 m_roller.set(0);

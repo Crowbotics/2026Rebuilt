@@ -54,8 +54,9 @@ public final class Constants {
         config = tempConfig;
     }
 
+    // Robot hub aiming
     public static final double kAimP = 0.003;
-    public static final double kAimAngleTolerance = 10; // degrees
+    public static final double kAimAngleTolerance = 3; // degrees
     public static final double kAimRotationalSpeedTolerance = 2; // degrees per second
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
@@ -104,7 +105,7 @@ public final class Constants {
     public static final int kArmCanId = 9;
     public static final int kRollerCanId = 10;
 
-    public static final double kRollerSpeed = 0.8; // percent
+    public static final double kRollerSpeed = 1; // percent
     public static final double kRollerJostleSpeed = 0.3; // percent
 
     public static final double kArmUnextendedSetpoint = 32.0; 
@@ -129,22 +130,23 @@ public final class Constants {
     public static final int kFlywheelFollowerCanId = 15;
     public static final int kHoodCanId = 14;
 
-    public static final double kShooterWheelRadius = 2;
+    public static final double kShooterWheelRadius = Units.inchesToMeters(2); // inches
     public static final double kFlywheelWindupTime = 0.77; // seconds
     public static final double kFlywheelRunOn = 0.5; // seconds before flywheel stops
 
     public static final double kFlywheelSpeed = 2.7; // default speed in meters per second
 
-    public static final double kHubHeight = 1.14; // meters
+    // Hub distance calculations
+    public static final double kHubHeight = 1.13; // meters
     public static final double kLimelightHeight = 0.316; // meters
     public static final double kLimelightPitch = 20.0; // degrees from horizontal
 
     // Fallback shoot buttons
     // For when close to the HUB
-    public static final double kCloseFlywheelSpeed = 2.35;
+    public static final double kCloseFlywheelSpeed = 2425; // rpm
     public static final double kCloseHoodAngle = 1.16;
     // For when near the TOWER
-    public static final double kFarFlywheelSpeed = 2.64;
+    public static final double kFarFlywheelSpeed = 2800; // rpm
     public static final double kFarHoodAngle = 10.88;
 
     public static final double kHoodTargetRelativeSetpoint = 0.5;
@@ -152,8 +154,8 @@ public final class Constants {
     public static final double kHoodAngleTolerance = 1; // degrees
     public static final double kHoodSpeedTolerance = 0.2; // degrees per second
 
-    public static final double kHoodZero = 0.062;
-    public static final double kHoodExtended = 1.37;
+    public static final double kHoodZero = 0.062; // ignore
+    public static final double kHoodExtended = 1.37; // ignore
 
     public static final double kTurningFactor = 360; // convert to degrees
   }
@@ -246,11 +248,12 @@ public final class Constants {
     public static final InterpolatingMatrixTreeMap<Double, N2, N1> ShootingMap = new InterpolatingMatrixTreeMap<>();
 
     static {
-      // distance (inches)
-      // speed, angle
-      ShootingMap.put(80.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2.44, 5.71}));
-      ShootingMap.put(163.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{3.24, 18.82}));
-      ShootingMap.put(112.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2.73, 13.47}));
+      // distance (inches), speed, angle
+      // Always put the decimal point
+      ShootingMap.put(62.9, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2512.63, 3.33}));
+      ShootingMap.put(136.0, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{3062.31, 11.05}));
+      ShootingMap.put(95.7, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2799.15, 7.24}));
+      ShootingMap.put(95.7, new Matrix<N2, N1>(Nat.N2(), Nat.N1(), new double[]{2799.15, 7.24}));
     }
   }
 }
