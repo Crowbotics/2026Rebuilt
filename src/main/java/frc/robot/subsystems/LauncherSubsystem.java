@@ -79,6 +79,7 @@ public class LauncherSubsystem extends SubsystemBase {
         testingHoodAngle = SmartDashboard.getNumber("Testing Hood Angle", m_hoodEncoder.getPosition());
         testingFlywheelSpeed = SmartDashboard.getNumber("Testing Flywheel Speed", 0.0);
 
+        SmartDashboard.putBoolean("Hub Visibility Indicator", LimelightHelpers.getTV(LimelightNames.kLauncherLimelight));
         SmartDashboard.putNumber("Hub Distance (Inches)", getHubDistanceInInches());
         SmartDashboard.putNumber("Hood Encoder", m_hoodEncoder.getPosition());
         SmartDashboard.putNumber("Hood Absolute Encoder", m_hoodAbsoluteEncoder.getPosition());
@@ -134,6 +135,11 @@ public class LauncherSubsystem extends SubsystemBase {
             }
             return false;
         }));
+    }
+
+    public void resetLauncher() {
+        setFlywheelSpeed(0);
+        m_hoodController.setSetpoint(LauncherConstants.kHoodZero, ControlType.kPosition);
     }
 
     public Command runFlywheelCommand() {
